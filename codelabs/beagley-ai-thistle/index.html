@@ -766,18 +766,34 @@ Type=simple
 ExecStart=/usr/local/bin/tuc -c /boot/tuc-config.json
 Restart=always
 RestartSec=30
+RuntimeMaxSec=3600
 User=root
 
 [Install]
 WantedBy=multi-user.target
 EOF
 
-# Enable and start service
-sudo systemctl daemon-reload
-sudo systemctl enable thistle-update.service
-sudo systemctl start thistle-update.service
+# Create timer for delayed start (90 seconds after boot)
+sudo tee /etc/systemd/system/thistle-update.timer > /dev/null << 'EOF'
+[Unit]
+Description=Thistle Update Client Timer
+Requires=thistle-update.service
 
-# Check service status
+[Timer]
+OnBootSec=90s
+Unit=thistle-update.service
+
+[Install]
+WantedBy=timers.target
+EOF
+
+# Enable and start timer (will start service after 90s boot delay)
+sudo systemctl daemon-reload
+sudo systemctl enable thistle-update.timer
+sudo systemctl start thistle-update.timer
+
+# Check timer and service status
+sudo systemctl status thistle-update.timer
 sudo systemctl status thistle-update.service</code></pre>
           </div>
         </section>
