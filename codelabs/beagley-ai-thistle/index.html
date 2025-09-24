@@ -30,7 +30,7 @@
         </div>
 
         <p style="margin-top: 2rem; font-size: 1rem; color: var(--text-muted);">
-          <strong>Resources:</strong> docs.thistle.tech • docs.beagleboard.org<br>
+          <strong>Resources:</strong> <a href="https://docs.thistle.tech" target="_blank">docs.thistle.tech</a> • <a href="https://docs.beagleboard.org" target="_blank">docs.beagleboard.org</a><br>
           <strong>Duration:</strong> 90 minutes • <strong>Level:</strong> Beginner to Intermediate
         </p>
       </section>
@@ -88,12 +88,12 @@
           <div class="grid grid-3">
             <div class="card">
               <h3>The Problem</h3>
-              <p>60% of IoT devices never receive security updates after deployment</p>
+              <p>Unpatched firmware causes 60% of IoT security breaches</p>
               <span class="badge badge-error">Critical Risk</span>
             </div>
             <div class="card">
               <h3>The Impact</h3>
-              <p>Unpatched devices contribute to billions in security breaches annually</p>
+              <p>IoT security failures cost businesses an average of $330,000 per incident</p>
               <span class="badge badge-warning">Business Cost</span>
             </div>
             <div class="card">
@@ -110,17 +110,17 @@
             <div class="card">
               <h4>Security Vulnerabilities</h4>
               <ul>
-                <li>85% of IoT devices have known vulnerabilities</li>
-                <li>Average time to patch: 205 days</li>
-                <li>Cost of breach: $4.45M average</li>
+                <li>50%+ of IoT devices have critical vulnerabilities</li>
+                <li>1 in 3 data breaches involves an IoT device</li>
+                <li>10 attacks per day on average home network</li>
               </ul>
             </div>
             <div class="card">
               <h4>Update Success Rates</h4>
               <ul>
-                <li>Traditional methods: 23% success rate</li>
-                <li>OTA updates: 94% success rate</li>
-                <li>Downtime reduction: 80%</li>
+                <li>Mobile OTA updates: 95-99% success rate</li>
+                <li>Automation reduces errors by 72%</li>
+                <li>Delta updates: 90-99% size reduction</li>
               </ul>
             </div>
           </div>
@@ -232,7 +232,7 @@
           <div class="card">
             <h4><span class="icon icon-network"></span>Thistle Account Setup <span class="status status-required">Required</span></h4>
             <div class="steps">
-              <div class="step">Visit <strong>app.thistle.tech</strong> and create free account</div>
+              <div class="step">Visit <strong><a href="https://app.thistle.tech" target="_blank">app.thistle.tech</a></strong> and create free account</div>
               <div class="step">Create new project for this workshop</div>
               <div class="step">Generate and copy Project Access Token</div>
               <div class="step">Keep token secure - treat like a password</div>
@@ -263,7 +263,7 @@
 
           <div class="card">
             <h3>Download BeagleBoard Imager</h3>
-            <p>Download from <strong>beagleboard.org/distros</strong></p>
+            <p>Download from <strong><a href="https://beagleboard.org/distros" target="_blank">beagleboard.org/distros</a></strong></p>
             <ul>
               <li><strong>Windows:</strong> .exe installer</li>
               <li><strong>macOS:</strong> .dmg package</li>
@@ -294,13 +294,54 @@
                 <div class="step">Set username: <code>debian</code></div>
                 <div class="step">Set strong password</div>
                 <div class="step">Set hostname: <code>beagley-ota</code></div>
-                <div class="step">Configure WiFi (optional)</div>
+                <div class="step">Configure WiFi SSID/password (optional)</div>
+                <div class="step">Add SSH public key (optional - recommended)</div>
               </div>
             </div>
           </div>
+        </section>
 
-          <div class="alert alert-warning">
-            <strong>Important:</strong> Pre-configuring SSH and networking saves significant setup time and ensures immediate connectivity after first boot.
+        <section class="compact">
+          <h3>SSH Key Setup <span class="status status-optional">Recommended</span></h3>
+
+          <div class="alert alert-info compact">
+            <strong>Why SSH Keys?</strong> SSH key authentication is more secure than passwords and enables seamless automation for file transfers and remote commands.
+          </div>
+
+          <div class="grid grid-2">
+            <div class="card compact">
+              <h4>Generate SSH Key (if needed)</h4>
+              <pre><code class="language-bash"># Generate new SSH key pair
+ssh-keygen -t ed25519 -C "beagley-workshop"
+
+# Use default location ~/.ssh/id_ed25519
+# Set passphrase or press Enter for none</code></pre>
+            </div>
+
+            <div class="card compact">
+              <h4>Copy Public Key</h4>
+              <pre><code class="language-bash"># Display public key for copying (ed25519 - recommended)
+cat ~/.ssh/id_ed25519.pub
+
+# Or if you have an existing RSA key
+cat ~/.ssh/id_rsa.pub
+
+# macOS: Copy to clipboard
+pbcopy < ~/.ssh/id_ed25519.pub
+
+# Linux: Copy to clipboard (if xclip installed)
+xclip -selection clipboard < ~/.ssh/id_ed25519.pub</code></pre>
+            </div>
+          </div>
+
+          <div class="card compact">
+            <h4>Add to bb-imager Configuration</h4>
+            <div class="steps compact">
+              <div class="step">In bb-imager, click Settings/Customization tab</div>
+              <div class="step">Find "SSH authorization public key" field</div>
+              <div class="step">Paste complete public key (starts with <code>ssh-ed25519</code> or <code>ssh-rsa</code>)</div>
+              <div class="step">Enable "USB DHCP" for USB networking</div>
+            </div>
           </div>
         </section>
 
@@ -357,7 +398,7 @@ ssh debian@192.168.6.2</code></pre>
               <h4>mDNS Resolution</h4>
               <pre><code class="language-bash">ssh debian@beagley-ota.local
 
-# Use password you configured</code></pre>
+# Password or SSH key (if configured)</code></pre>
             </div>
 
             <div class="card">
@@ -367,6 +408,20 @@ ssh debian@192.168.6.2</code></pre>
 # Find IP in router interface
 # or use network scanner</code></pre>
             </div>
+          </div>
+        </section>
+
+        <section>
+          <h3>Update System</h3>
+
+          <div class="card">
+            <h4>Update Package Repository</h4>
+            <pre><code class="language-bash"># Update package lists and upgrade system
+sudo apt update && sudo apt upgrade -y</code></pre>
+          </div>
+
+          <div class="alert alert-info compact">
+            <strong>Note:</strong> This ensures you have the latest packages and security updates before installing tools.
           </div>
         </section>
 
@@ -389,7 +444,7 @@ which gpioset gpiofind</code></pre>
           </div>
 
           <div class="alert alert-success">
-            <strong>Success Criteria:</strong> All commands execute successfully, showing Linux kernel version, network connectivity, adequate storage, and GPIO utilities present.
+            <strong>Success Criteria:</strong> All commands execute successfully, showing Linux kernel version, network connectivity, adequate storage, and GPIO utilities present. If SSH keys were configured, connection should be seamless without password prompt.
           </div>
         </section>
       </section>
@@ -409,35 +464,25 @@ which gpioset gpiofind</code></pre>
           <h3>Install TRH (Workstation)</h3>
 
           <div class="card">
-            <h4>Download and Install Release Helper</h4>
-            <pre><code class="language-bash"># Set version variable
-VER=1.6.0
-
-# Download for your platform
-# Linux x86_64:
-curl -LO "https://downloads.thistle.tech/embedded-client/$VER/trh-$VER-x86_64-unknown-linux-musl.gz"
-
-# macOS (Apple Silicon):
-curl -LO "https://downloads.thistle.tech/embedded-client/$VER/trh-$VER-aarch64-apple-darwin.gz"
-
-# macOS (Intel):
-curl -LO "https://downloads.thistle.tech/embedded-client/$VER/trh-$VER-x86_64-apple-darwin.gz"</code></pre>
+            <h4>Download Release Helper</h4>
+            <div class="steps">
+              <div class="step">Visit <strong><a href="https://docs.thistle.tech/binaries" target="_blank">docs.thistle.tech/binaries</a></strong> for download links and install instructions</div>
+              <div class="step">Download TRH for your platform (Linux x86_64, macOS x86_64/aarch64, Windows x86_64)</div>
+              <div class="step">Extract and make executable</div>
+            </div>
+            <pre><code class="language-bash"># After downloading from Thistle Control Center
+gunzip trh-*.gz
+chmod +x trh-*
+sudo mv trh-* /usr/local/bin/trh</code></pre>
           </div>
         </section>
 
         <section>
-          <h3>Complete TRH Installation</h3>
+          <h3>Verify TRH Installation</h3>
 
           <div class="card">
-            <h4>Extract and Make Executable</h4>
-            <pre><code class="language-bash"># Extract and set permissions
-gunzip trh-*.gz
-chmod +x trh-*
-
-# Move to system PATH (optional)
-sudo mv trh-* /usr/local/bin/trh
-
-# Verify installation
+            <h4>Test Installation</h4>
+            <pre><code class="language-bash"># Verify installation
 trh --help</code></pre>
           </div>
 
@@ -450,22 +495,25 @@ trh --help</code></pre>
           <h3>Install TUC (BeagleY-AI)</h3>
 
           <div class="card">
-            <h4>SSH to Device and Install Update Client</h4>
-            <pre><code class="language-bash"># On BeagleY-AI via SSH
+            <h4>Download Update Client for Device</h4>
+            <div class="steps">
+              <div class="step">Download TUC directly on BeagleY-AI device</div>
+              <div class="step">Install system-wide on device</div>
+              <div class="step">Verify installation</div>
+            </div>
+            <pre><code class="language-bash"># On BeagleY-AI via SSH - download directly on device
 VER=1.6.0
-curl -LO "https://downloads.thistle.tech/embedded-client/$VER/tuc-$VER-aarch64-unknown-linux-musl.gz"
-
-# Extract and install system-wide
-gunzip tuc-*.gz
-chmod +x tuc-*
-sudo mv tuc-* /usr/local/bin/tuc
+curl -LO https://downloads.thistle.tech/embedded-client/$VER/tuc-$VER-aarch64-unknown-linux-musl.gz
+gunzip tuc-$VER-aarch64-unknown-linux-musl.gz
+chmod +x tuc-$VER-aarch64-unknown-linux-musl
+sudo mv tuc-$VER-aarch64-unknown-linux-musl /usr/local/bin/tuc
 
 # Verify installation
 tuc --help | head -n 3</code></pre>
           </div>
 
           <div class="alert alert-info">
-            <strong>Note:</strong> ARM64 (aarch64) binary is required for BeagleY-AI. The system-wide installation in <code>/usr/local/bin</code> ensures availability from any location.
+            <strong>Note:</strong> ARM64 (aarch64) binary is required for BeagleY-AI. Download from Thistle Control Center requires authenticated access.
           </div>
         </section>
       </section>
@@ -494,38 +542,20 @@ mkdir ~/beagley-demo
 cd ~/beagley-demo
 
 # Initialize Thistle project with remote signing
-trh --signing-method="remote" init</code></pre>
+trh --signing-method="remote" init --persist="/boot"</code></pre>
           </div>
 
           <div class="card">
             <h4>Generated Files</h4>
             <ul>
-              <li><strong>config.json</strong> - Device enrollment configuration</li>
+              <li><strong>config.json</strong> - Device enrollment configuration with enrollment token</li>
               <li><strong>manifest.json</strong> - Update package template</li>
             </ul>
             <p>Remote signing eliminates the need for local private keys, improving security.</p>
           </div>
-        </section>
 
-        <section>
-          <h3>Device Configuration</h3>
-
-          <div class="card">
-            <h4>Generate Device-Specific Config</h4>
-            <pre><code class="language-bash"># Generate device configuration
-trh --signing-method="remote" gen-device-config \
-  --device-name="beagley-demo" \
-  --enrollment-type="group-enroll" \
-  --persist="/boot"</code></pre>
-          </div>
-
-          <div class="alert alert-info">
-            <strong>Parameter Explanation:</strong>
-            <ul>
-              <li><strong>device-name:</strong> Unique identifier for this device</li>
-              <li><strong>group-enroll:</strong> Automatic enrollment on first connection</li>
-              <li><strong>persist:</strong> Directory for storing update state</li>
-            </ul>
+          <div class="alert alert-success compact">
+            <strong>Expected Output:</strong> Enrollment token, remote keypair generation, public key display, config file with <code>/boot</code> persist path.
           </div>
         </section>
 
@@ -565,10 +595,15 @@ ls -l /boot/tuc-config.json</code></pre>
         <section>
           <h3>Create Update Content</h3>
 
+          <div class="alert alert-info compact">
+            <strong>Location:</strong> All commands in this section run on your workstation in the <code>~/beagley-demo</code> directory.
+          </div>
+
           <div class="card">
             <h4>Prepare Directory Structure</h4>
-            <pre><code class="language-bash"># Create directory for update files
-mkdir -p ~/beagley-demo/files</code></pre>
+            <pre><code class="language-bash"># Navigate to project directory and create files folder
+cd ~/beagley-demo
+mkdir -p files</code></pre>
           </div>
         </section>
 
@@ -577,49 +612,34 @@ mkdir -p ~/beagley-demo/files</code></pre>
 
           <div class="card">
             <h4>LED Control Script with Fallback</h4>
-            <pre><code class="language-bash">cat > ~/beagley-demo/files/blink.sh << 'EOF'
+            <pre><code class="language-bash">cat > files/blink.sh << 'EOF'
 #!/bin/bash
-# Professional LED blink script with hardware detection
-set -euo pipefail
 
-echo "OTA Update Applied Successfully - Version 1.0"
-echo "LED Control Script Starting..."
-echo "Press Ctrl+C to stop"
+CHIP="gpiochip2"
+LINE=14
+INTERVAL=2
 
-# Check for GPIO tools and hardware
-if command -v gpioset >/dev/null 2>&1; then
-    GPIO_CHIP="gpiochip0"
-    GPIO_PIN="14"
+echo "Blinking GPIO$LINE on $CHIP every $INTERVAL seconds. Press Ctrl+C to stop."
 
-    # Test GPIO access
-    if gpioset $GPIO_CHIP $GPIO_PIN=0 2>/dev/null; then
-        echo "Hardware GPIO detected - LED will blink"
-        trap 'gpioset $GPIO_CHIP $GPIO_PIN=0' EXIT
+trap 'echo "Stopping..."; pkill -f "gpioset --chip $CHIP -z $LINE"; sudo gpioset --chip $CHIP -z $LINE=0; exit 0' INT
 
-        while true; do
-            gpioset $GPIO_CHIP $GPIO_PIN=1  # LED ON
-            sleep 0.5
-            gpioset $GPIO_CHIP $GPIO_PIN=0  # LED OFF
-            sleep 0.5
-        done
-    else
-        echo "GPIO access denied or hardware not found"
-        echo "Running simulation mode..."
-    fi
-else
-    echo "GPIO tools not available - simulation mode"
-fi
-
-# Fallback simulation
+i=0
 while true; do
-    echo "LED: ON"
-    sleep 0.5
-    echo "LED: OFF"
-    sleep 0.5
+    i=$((i+1))
+
+    pkill -f "gpioset --chip $CHIP -z $LINE" 2>/dev/null
+    sudo gpioset --chip $CHIP -z $LINE=1
+    echo "Blink $i: ON"
+    sleep $INTERVAL
+
+    pkill -f "gpioset --chip $CHIP -z $LINE" 2>/dev/null
+    sudo gpioset --chip $CHIP -z $LINE=0
+    echo "Blink $i: OFF"
+    sleep $INTERVAL
 done
 EOF
 
-chmod +x ~/beagley-demo/files/blink.sh</code></pre>
+chmod +x files/blink.sh</code></pre>
           </div>
         </section>
       </section>
@@ -640,21 +660,14 @@ chmod +x ~/beagley-demo/files/blink.sh</code></pre>
 
           <div class="card">
             <h4>Prepare Signed Manifest</h4>
-            <pre><code class="language-bash"># Navigate to project directory
-cd ~/beagley-demo
-
-# Package files with target installation path
+            <pre><code class="language-bash"># Package files with target installation path
 trh --signing-method="remote" prepare \
   --target=./files \
   --file-base-path=/opt/demo</code></pre>
           </div>
 
-          <div class="alert alert-info">
-            <strong>Parameter Explanation:</strong>
-            <ul>
-              <li><strong>target:</strong> Local directory containing files to package</li>
-              <li><strong>file-base-path:</strong> Installation path on target device</li>
-            </ul>
+          <div class="alert alert-success compact">
+            <strong>Expected Output:</strong> Read manifest, processed files, manifest amended successfully.
           </div>
         </section>
 
@@ -667,12 +680,8 @@ trh --signing-method="remote" prepare \
 trh --signing-method="remote" release</code></pre>
           </div>
 
-          <div class="alert alert-success">
-            <strong>Expected Output:</strong>
-            <pre><code>Uploading manifest...
-Uploading file bundle...
-Release successful! Version: 1
-Update available to enrolled devices</code></pre>
+          <div class="alert alert-success compact">
+            <strong>Expected Output:</strong> Read manifest, uploaded assets, manifest uploaded successfully, compressed artifacts removed locally.
           </div>
 
           <div class="card">
@@ -708,17 +717,13 @@ sudo tuc -c /boot/tuc-config.json</code></pre>
           </div>
 
           <div class="alert alert-success">
-            <strong>Expected Process Flow:</strong>
-            <pre><code>[INFO] Device enrollment starting...
-[INFO] Trust-on-first-use authentication
-[INFO] Checking for available updates...
-[INFO] Update found: Version 1
-[INFO] Downloading manifest...
-[INFO] Verifying cryptographic signature... ✓
-[INFO] Downloading file bundle...
-[INFO] Verifying file integrity...
-[INFO] Installing to /opt/demo/ ...
-[SUCCESS] Update applied successfully</code></pre>
+            <strong>Expected Output:</strong>
+            <pre><code>!! enrolling new device with server...
+!! Thistle client starting with no bootloader set - file only mode
+!! installing update 0 => 2
+!! setting update status to Started
+!! setting update status to Pass</code></pre>
+            <p>Press <strong>Ctrl+C</strong> to stop the client after successful installation.</p>
           </div>
         </section>
 
@@ -728,23 +733,52 @@ sudo tuc -c /boot/tuc-config.json</code></pre>
           <div class="card">
             <h4>Test Update Deployment</h4>
             <pre><code class="language-bash"># Verify file installation
-ls -la /opt/demo/
-
-# Check file permissions
-ls -l /opt/demo/blink.sh
+ls /opt/demo/
+cat /opt/demo/blink.sh
 
 # Execute the update
 sudo bash /opt/demo/blink.sh</code></pre>
           </div>
 
-          <div class="alert alert-success">
-            <strong>Success Indicators:</strong>
-            <ul>
-              <li>Script file present with execute permissions</li>
-              <li>LED blinks if hardware connected</li>
-              <li>Simulation output if no hardware</li>
-              <li>No error messages during execution</li>
-            </ul>
+          <div class="alert alert-success compact">
+            <strong>Success Indicators:</strong> File present at <code>/opt/demo/blink.sh</code>, LED blinks or simulation output, update status shows "Pass".
+          </div>
+        </section>
+
+        <section>
+          <h3>Optional: Auto-Start Service</h3>
+
+          <div class="alert alert-info compact">
+            <strong>Note:</strong> TUC doesn't run automatically on boot. For production deployments, create a systemd service.
+          </div>
+
+          <div class="card">
+            <h4>Create Systemd Service</h4>
+            <pre><code class="language-bash"># Create service file
+sudo tee /etc/systemd/system/thistle-update.service > /dev/null << 'EOF'
+[Unit]
+Description=Thistle Update Client
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/tuc -c /boot/tuc-config.json
+Restart=always
+RestartSec=30
+User=root
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+# Enable and start service
+sudo systemctl daemon-reload
+sudo systemctl enable thistle-update.service
+sudo systemctl start thistle-update.service
+
+# Check service status
+sudo systemctl status thistle-update.service</code></pre>
           </div>
         </section>
       </section>
@@ -755,10 +789,9 @@ sudo bash /opt/demo/blink.sh</code></pre>
           <h2>Production Deployment</h2>
           <p class="lead">Scaling to enterprise environments</p>
 
-          <div class="grid grid-2">
-            <div class="card">
-              <h3>CI/CD Integration</h3>
-              <pre><code class="language-yaml"># GitHub Actions Example
+          <div class="card compact">
+            <h3>CI/CD Integration Example</h3>
+            <pre><code class="language-yaml"># GitHub Actions Example
 name: Deploy OTA Update
 on:
   push:
@@ -773,19 +806,17 @@ jobs:
         env:
           THISTLE_TOKEN: ${{ secrets.THISTLE_TOKEN }}
         run: |
-          trh --signing-method="remote" prepare \
-            --target=./release
+          trh --signing-method="remote" prepare --target=./release
           trh --signing-method="remote" release</code></pre>
-            </div>
+          </div>
 
-            <div class="card">
-              <h3>Fleet Management Features</h3>
-              <ul>
-                <li><strong>Device Groups:</strong> Staged rollout control</li>
-                <li><strong>Update Scheduling:</strong> Maintenance windows</li>
-                <li><strong>Rollback Triggers:</strong> Automatic failure detection</li>
-                <li><strong>Monitoring:</strong> Real-time deployment status</li>
-              </ul>
+          <div class="card compact">
+            <h3>Fleet Management Features</h3>
+            <div style="font-size: 0.9rem; line-height: 1.3;">
+              <strong>Device Groups:</strong> Staged rollout control •
+              <strong>Update Scheduling:</strong> Maintenance windows •
+              <strong>Rollback Triggers:</strong> Automatic failure detection •
+              <strong>Monitoring:</strong> Real-time deployment status
             </div>
           </div>
         </section>
@@ -817,10 +848,10 @@ jobs:
             <div class="card">
               <h4>Delta Updates</h4>
               <ul>
-                <li>90% size reduction typical</li>
-                <li>Binary-level differences</li>
-                <li>Bandwidth optimization</li>
-                <li>Faster deployment</li>
+                <li>90-99% size reduction typical</li>
+                <li>Binary-level differences only</li>
+                <li>120MB → 8MB example (93% reduction)</li>
+                <li>5 hours → 20 minutes deployment</li>
               </ul>
             </div>
           </div>
@@ -832,17 +863,17 @@ jobs:
           <div class="grid grid-3">
             <div class="card">
               <h4>Automotive Sector</h4>
-              <p>10,000+ EV charging stations receiving weekly security updates with 99.7% success rate</p>
+              <p>Thousands of EV charging stations and vehicle systems receiving regular security updates</p>
               <span class="badge badge-success">Production Scale</span>
             </div>
             <div class="card">
               <h4>Industrial IoT</h4>
-              <p>50,000+ environmental sensors with automated firmware updates and predictive maintenance</p>
+              <p>Large-scale sensor networks with automated firmware updates and remote management</p>
               <span class="badge badge-success">Mission Critical</span>
             </div>
             <div class="card">
-              <h4>Healthcare Devices</h4>
-              <p>5,000+ patient monitoring devices with zero-downtime updates and regulatory compliance</p>
+              <h4>Smart Infrastructure</h4>
+              <p>Connected devices in smart cities, buildings, and industrial automation systems</p>
               <span class="badge badge-success">Safety Critical</span>
             </div>
           </div>
@@ -851,88 +882,174 @@ jobs:
 
       <!-- Troubleshooting -->
       <section>
-        <h2>Troubleshooting Guide</h2>
+        <section>
+          <h2>Troubleshooting Guide</h2>
 
-        <div class="grid grid-3">
-          <div class="card">
-            <h3>Update Not Available</h3>
-            <h4>Diagnostic Steps</h4>
-            <ul>
-              <li>Verify device internet connectivity</li>
-              <li>Confirm THISTLE_TOKEN environment variable</li>
-              <li>Check that <code>trh release</code> completed successfully</li>
-              <li>Verify device enrollment in web console</li>
-            </ul>
+          <div class="grid grid-3">
+            <div class="card">
+              <h3>Update Not Available</h3>
+              <h4>Diagnostic Steps</h4>
+              <ul>
+                <li>Verify device internet connectivity</li>
+                <li>Confirm THISTLE_TOKEN environment variable</li>
+                <li>Check that <code>trh release</code> completed successfully</li>
+                <li>Verify device enrollment in web console</li>
+              </ul>
+            </div>
+
+            <div class="card">
+              <h3>Signature Verification Failed</h3>
+              <h4>Common Causes</h4>
+              <ul>
+                <li>Clock skew between device and server</li>
+                <li>Corrupted configuration file</li>
+                <li>Network interference during download</li>
+                <li>Expired authentication tokens</li>
+              </ul>
+            </div>
+
+            <div class="card">
+              <h3>Application Errors</h3>
+              <h4>Debug Commands</h4>
+              <ul>
+                <li><code>tuc -v</code> for verbose logging</li>
+                <li><code>journalctl -f</code> for system logs</li>
+                <li>Check file permissions and paths</li>
+                <li>Verify GPIO hardware connections</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h3>WiFi Connection Issues</h3>
+          <p class="lead">If WiFi isn't connecting, use USB connection to diagnose and fix</p>
+
+          <div class="alert alert-info">
+            <strong>Fallback Strategy:</strong> Connect via USB cable and SSH to <code>beagley-ota.local</code> or <code>192.168.7.2</code> to troubleshoot WiFi connectivity.
           </div>
 
           <div class="card">
-            <h3>Signature Verification Failed</h3>
-            <h4>Common Causes</h4>
-            <ul>
-              <li>Clock skew between device and server</li>
-              <li>Corrupted configuration file</li>
-              <li>Network interference during download</li>
-              <li>Expired authentication tokens</li>
-            </ul>
+            <h4>Check Network Interfaces</h4>
+            <pre><code class="language-bash"># Check all network interfaces
+ip a
+
+# Look for wlan0 interface status
+# Should see: wlan0: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; when working</code></pre>
           </div>
 
           <div class="card">
-            <h3>Application Errors</h3>
-            <h4>Debug Commands</h4>
+            <h4>Bring Up WiFi Interface</h4>
+            <pre><code class="language-bash"># Enable the WiFi interface
+sudo ip link set wlan0 up
+
+# Scan for available networks
+sudo iwlist wlan0 scan | grep ESSID</code></pre>
+          </div>
+        </section>
+
+        <section>
+          <h3>Manual WiFi Configuration</h3>
+
+          <div class="grid grid-2">
+            <div class="card">
+              <h4>Create WPA Supplicant Config</h4>
+              <pre><code class="language-bash"># Create/edit WiFi configuration
+sudo nano /etc/wpa_supplicant/wpa_supplicant-wlan0.conf
+
+# Add network configuration:
+network={
+    ssid="Your-WiFi-Name"
+    psk="your-wifi-password"
+}</code></pre>
+            </div>
+
+            <div class="card">
+              <h4>Start WiFi Connection</h4>
+              <pre><code class="language-bash"># Start wpa_supplicant
+sudo wpa_supplicant -B -i wlan0 -c /etc/wpa_supplicant/wpa_supplicant-wlan0.conf
+
+# Request IP address
+sudo dhclient wlan0
+
+# Verify connection
+ip a | grep wlan0</code></pre>
+            </div>
+          </div>
+
+          <div class="alert alert-success">
+            <strong>Success Indicators:</strong>
             <ul>
-              <li><code>tuc -v</code> for verbose logging</li>
-              <li><code>journalctl -f</code> for system logs</li>
-              <li>Check file permissions and paths</li>
-              <li>Verify GPIO hardware connections</li>
+              <li><code>wlan0</code> shows <code>UP,LOWER_UP</code> state</li>
+              <li>IP address assigned (e.g., <code>192.168.0.89/24</code>)</li>
+              <li>Can ping external addresses: <code>ping -c 3 8.8.8.8</code></li>
             </ul>
           </div>
-        </div>
 
-        <div class="alert alert-info">
-          <strong>Support Resources:</strong> Use <code>trh fetch-current</code> to inspect deployed manifests and verify expected file contents and metadata.
-        </div>
+          <div class="alert alert-info">
+            <strong>Pro Tip:</strong> Once WiFi is working, you can disconnect USB and continue the workshop over WiFi using the assigned IP address or <code>beagley-ota.local</code>.
+          </div>
+        </section>
+
+        <section>
+          <h3>Additional Troubleshooting</h3>
+
+          <div class="alert alert-info">
+            <strong>Support Resources:</strong> Use <code>trh fetch-current</code> to inspect deployed manifests and verify expected file contents and metadata.
+          </div>
+        </section>
       </section>
 
       <!-- Summary -->
       <section>
-        <h2>Workshop Summary</h2>
-        <p class="lead">Professional OTA infrastructure implemented</p>
+        <section>
+          <h2>Workshop Summary</h2>
+          <p class="lead">Professional OTA infrastructure implemented</p>
 
-        <div class="grid grid-2">
-          <div class="card">
-            <h3>Security Achievements</h3>
-            <ul>
-              <li>Cryptographic signing with cloud-based KMS</li>
-              <li>Device authentication and enrollment</li>
-              <li>Signature verification before installation</li>
-              <li>Atomic file operations with rollback safety</li>
-            </ul>
+          <div class="grid grid-2">
+            <div class="card">
+              <h3>Security Achievements</h3>
+              <ul>
+                <li>Cryptographic signing with cloud-based KMS</li>
+                <li>Device authentication and enrollment</li>
+                <li>Signature verification before installation</li>
+                <li>Atomic file operations with rollback safety</li>
+              </ul>
+            </div>
+
+            <div class="card">
+              <h3>Production Capabilities</h3>
+              <ul>
+                <li>Cloud-based update distribution</li>
+                <li>Fleet management and monitoring</li>
+                <li>CI/CD integration ready</li>
+                <li>Scalable to thousands of devices</li>
+              </ul>
+            </div>
           </div>
 
-          <div class="card">
-            <h3>Production Capabilities</h3>
-            <ul>
-              <li>Cloud-based update distribution</li>
-              <li>Fleet management and monitoring</li>
-              <li>CI/CD integration ready</li>
-              <li>Scalable to thousands of devices</li>
-            </ul>
+          <div class="alert alert-success">
+            <strong>Key Insight:</strong> You have implemented the same security model used by smartphones, automotive systems, and industrial IoT deployments. The LED blink demonstrates the complete secure update pipeline.
           </div>
-        </div>
+        </section>
 
-        <div class="alert alert-success">
-          <strong>Key Insight:</strong> You have implemented the same security model used by smartphones, automotive systems, and industrial IoT deployments. The LED blink demonstrates the complete secure update pipeline.
-        </div>
-
-        <div class="card">
+        <section>
           <h3>Next Steps</h3>
-          <ul>
-            <li><strong>Explore A/B Updates:</strong> Full system rollback with dual partitions</li>
-            <li><strong>Implement Secure Boot:</strong> Hardware-verified boot chain</li>
-            <li><strong>CI/CD Integration:</strong> Automate releases from build pipeline</li>
-            <li><strong>Device Groups:</strong> Manage staged rollouts across fleet</li>
-          </ul>
-        </div>
+
+          <div class="card">
+            <h4>Advanced OTA Features</h4>
+            <ul>
+              <li><strong>Explore A/B Updates:</strong> Full system rollback with dual partitions</li>
+              <li><strong>Implement Secure Boot:</strong> Hardware-verified boot chain</li>
+              <li><strong>CI/CD Integration:</strong> Automate releases from build pipeline</li>
+              <li><strong>Device Groups:</strong> Manage staged rollouts across fleet</li>
+            </ul>
+          </div>
+
+          <div class="alert alert-info">
+            <strong>Recommended Learning Path:</strong> Start with CI/CD integration using your existing file update knowledge, then explore A/B updates for critical systems, and finally implement Secure Boot for maximum security.
+          </div>
+        </section>
       </section>
 
       <!-- Thank You -->
@@ -940,7 +1057,7 @@ jobs:
         <h1>Workshop Complete</h1>
         <p class="subtitle">Professional OTA Updates Implemented</p>
 
-        <div class="alert alert-success" style="max-width: 800px; margin: 2rem auto;">
+        <div class="alert alert-success compact" style="max-width: 800px; margin: 1rem auto;">
           <strong>Skills Acquired:</strong> Cryptographic signing, device authentication, secure deployment, fleet management, production security practices
         </div>
 
@@ -949,13 +1066,13 @@ jobs:
           <span class="logo">Thistle Technologies</span>
         </div>
 
-        <p style="margin-top: 2rem; font-size: 1.1rem;">
-          <strong>Documentation:</strong> docs.thistle.tech • docs.beagleboard.org<br>
-          <strong>Community:</strong> BeagleBoard Discord • Thistle Support Portal<br>
+        <p style="margin-top: 1rem; font-size: 1rem; line-height: 1.4;">
+          <strong>Documentation:</strong> <a href="https://docs.thistle.tech" target="_blank">docs.thistle.tech</a> • <a href="https://docs.beagleboard.org" target="_blank">docs.beagleboard.org</a><br>
+          <strong>Community:</strong> <a href="https://discord.gg/beagleboard" target="_blank">BeagleBoard Discord</a> • Thistle Support Portal<br>
           <strong>Advanced Topics:</strong> Secure Boot OTA Workshop
         </p>
 
-        <div class="alert alert-info" style="max-width: 600px; margin: 2rem auto;">
+        <div class="alert alert-info compact" style="max-width: 600px; margin: 1rem auto;">
           <strong>Navigation:</strong> Use arrow keys or press 'S' for detailed speaker notes throughout any section.
         </div>
       </section>
