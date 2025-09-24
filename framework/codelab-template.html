@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>{{CODELAB_TITLE}} - Professional Codelab</title>
+
+  <!-- Reveal.js Core -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/reveal.css">
+  <link rel="stylesheet" href="../../framework/thistle-theme.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github-dark.min.css">
+</head>
+
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+      <!-- Title Slide -->
+      <section class="title-slide" data-background-gradient="linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0c4a6e 100%)">
+        <h1>{{CODELAB_TITLE}}</h1>
+        <p class="subtitle">{{CODELAB_SUBTITLE}}</p>
+
+        <div class="logos">
+          <span class="logo">BeagleBoard.org</span>
+          <span class="logo">Thistle Technologies</span>
+        </div>
+
+        <div class="alert alert-info" style="max-width: 600px; margin: 2rem auto;">
+          <strong>Today's Mission:</strong> {{CODELAB_MISSION}}
+        </div>
+
+        <p style="margin-top: 2rem; font-size: 1rem; color: var(--text-muted);">
+          <strong>Resources:</strong> {{CODELAB_RESOURCES}}<br>
+          <strong>Duration:</strong> {{CODELAB_DURATION}} • <strong>Level:</strong> {{CODELAB_LEVEL}}
+        </p>
+      </section>
+
+      <!-- Content slides go here -->
+      {{CONTENT_SLIDES}}
+
+      <!-- Thank You -->
+      <section class="title-slide">
+        <h1>Mission Complete!</h1>
+        <p class="subtitle">{{COMPLETION_MESSAGE}}</p>
+
+        <div class="alert alert-success" style="max-width: 700px; margin: 2rem auto;">
+          <strong>You mastered:</strong> {{SKILLS_LEARNED}}
+        </div>
+
+        <div class="logos">
+          <span class="logo">BeagleBoard.org</span>
+          <span class="logo">Thistle Technologies</span>
+        </div>
+
+        <p style="margin-top: 2rem; font-size: 1.1rem;">
+          <strong>Resources:</strong> {{CODELAB_RESOURCES}}<br>
+          <strong>Community:</strong> {{COMMUNITY_LINKS}}<br>
+          <strong>Next:</strong> {{NEXT_STEPS}}
+        </p>
+
+        <div class="alert alert-info" style="max-width: 600px; margin: 2rem auto;">
+          <strong>Questions?</strong> Use arrow keys to navigate back to any section or press 'S' for speaker notes.
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <!-- Reveal.js and Plugins -->
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/reveal.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@5/plugin/notes/notes.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@5/plugin/search/search.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@5/plugin/zoom/zoom.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@5/plugin/highlight/highlight.js"></script>
+  <script src="../../framework/codelab-framework.js"></script>
+
+  <script>
+    // Initialize Reveal.js
+    Reveal.initialize({
+      hash: true,
+      controls: true,
+      progress: true,
+      center: false,
+      slideNumber: 'c/t',
+      width: 1280,
+      height: 720,
+      margin: 0.04,
+      plugins: [RevealNotes, RevealSearch, RevealZoom, RevealHighlight],
+
+      // Navigation configuration
+      keyboard: {
+        67: () => { // 'C' key for copy
+          const currentSlide = Reveal.getCurrentSlide();
+          const firstCodeBlock = currentSlide.querySelector('pre code');
+          if (firstCodeBlock && navigator.clipboard) {
+            navigator.clipboard.writeText(firstCodeBlock.textContent);
+          }
+        }
+      },
+
+      // Theme and visual settings
+      transition: 'slide',
+      transitionSpeed: 'default',
+      backgroundTransition: 'fade'
+    });
+
+    // Add speaker notes for key slides
+    Reveal.addEventListener('ready', () => {
+      // Add contextual help
+      console.log('🚀 Thistle Codelab Ready!');
+      console.log('💡 Press "C" to copy code blocks');
+      console.log('📖 Press "S" for speaker notes');
+      console.log('🔍 Press "/" to search');
+    });
+  </script>
+</body>
+</html>

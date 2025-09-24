@@ -1,0 +1,2566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BeagleY-AI + Thistle OTA Professional Codelab</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1e40af;
+            --secondary: #f97316;
+            --bg-gradient-start: #1e3a8a;
+            --bg-gradient-end: #312e81;
+            --text-primary: #1e293b;
+            --text-secondary: #475569;
+            --text-muted: #64748b;
+            --card-bg: #f8fafc;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+            color: var(--text-primary);
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .presentation {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .slide {
+            position: absolute;
+            width: 92%;
+            max-width: 1200px;
+            height: 85vh;
+            max-height: 85vh;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            padding: 2.5rem;
+            display: none;
+            overflow: hidden;
+        }
+
+        .slide.active {
+            display: flex;
+            flex-direction: column;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .slide-content {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding-right: 1rem;
+        }
+
+        /* Ensure content scrolls if needed but slide container never exceeds viewport */
+        .slide-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .slide-content::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        .slide-content::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 4px;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--primary-dark);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        h2 {
+            font-size: 1.75rem;
+            font-weight: 600;
+            margin: 1.25rem 0 0.75rem 0;
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin: 1rem 0 0.5rem 0;
+            color: var(--text-secondary);
+        }
+
+        p {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: var(--text-secondary);
+            margin-bottom: 0.75rem;
+        }
+
+        .lead {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+            font-weight: 500;
+        }
+
+        .icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.5rem;
+            height: 2.5rem;
+            flex-shrink: 0;
+        }
+
+        .icon svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.25rem;
+            margin: 1.25rem 0;
+        }
+
+        .card {
+            background: var(--card-bg);
+            padding: 1.25rem;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .feature-card {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .feature-card .icon {
+            width: 3rem;
+            height: 3rem;
+            background: var(--primary);
+            color: white;
+            border-radius: 10px;
+            padding: 0.75rem;
+        }
+
+        .feature-content h3 {
+            margin-top: 0;
+        }
+
+        .code {
+            background: #0f172a;
+            color: #94a3b8;
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin: 1rem 0;
+            overflow-x: auto;
+        }
+
+        .code .comment {
+            color: #64748b;
+        }
+
+        .code .command {
+            color: #22d3ee;
+        }
+
+        .code .string {
+            color: #86efac;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+        }
+
+        .alert-info {
+            background: #dbeafe;
+            border-left: 4px solid var(--primary);
+            color: var(--primary-dark);
+        }
+
+        .alert-success {
+            background: #dcfce7;
+            border-left: 4px solid var(--success);
+            color: #166534;
+        }
+
+        .alert-warning {
+            background: #fef3c7;
+            border-left: 4px solid var(--warning);
+            color: #92400e;
+        }
+
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin: 1.5rem 0;
+        }
+
+        .controls {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 0.75rem;
+            z-index: 100;
+        }
+
+        button {
+            background: white;
+            color: var(--text-primary);
+            border: 2px solid #e2e8f0;
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        button:hover:not(:disabled) {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        button:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.2);
+            z-index: 100;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--secondary);
+            transition: width 0.3s ease;
+        }
+
+        .slide-number {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            background: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            font-size: 0.9rem;
+        }
+
+        .title-slide {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .title-slide h1 {
+            font-size: 3.5rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+        }
+
+        .subtitle {
+            font-size: 1.75rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+        }
+
+        .specs-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        .specs-table td {
+            padding: 0.5rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .specs-table td:first-child {
+            font-weight: 600;
+            color: var(--text-primary);
+            width: 40%;
+        }
+
+        ul {
+            margin: 0.75rem 0;
+            padding-left: 1.5rem;
+        }
+
+        li {
+            font-size: 1.05rem;
+            line-height: 1.5;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .flow-diagram {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .flow-item {
+            background: var(--card-bg);
+            padding: 1rem;
+            border-radius: 10px;
+            border: 2px solid var(--primary);
+            text-align: center;
+            min-width: 140px;
+        }
+
+        .flow-arrow {
+            color: var(--secondary);
+            font-size: 1.5rem;
+        }
+
+        .compact-list {
+            columns: 2;
+            column-gap: 2rem;
+        }
+
+        .compact-list li {
+            font-size: 0.95rem;
+            margin-bottom: 0.35rem;
+        }
+
+        @media (max-width: 768px) {
+            .slide {
+                padding: 2rem;
+                height: 90vh;
+            }
+            
+            h1 { font-size: 1.75rem; }
+            .title-slide h1 { font-size: 2.5rem; }
+            
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+            
+            .compact-list {
+                columns: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+    
+    <div class="slide-number" id="slideNumber">1 / 23</div>
+    
+    <div class="presentation">
+        <!-- Slide 1: Title -->
+        <div class="slide active title-slide">
+            <h1>BeagleY-AI + Thistle Tech</h1>
+            <p class="subtitle">Professional OTA Updates for Edge Devices</p>
+            <div class="alert alert-info" style="max-width: 600px;">
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M12 16v-4M12 8h.01"/>
+                </svg>
+                <div>
+                    <strong>Today's Achievement:</strong><br>
+                    Deploy cryptographically signed software updates wirelessly to embedded hardware
+                </div>
+            </div>
+            <p style="margin-top: 2rem; color: var(--text-muted);">BeagleBoard.org × Thistle Technologies</p>
+        </div>
+
+        <!-- Slide 2: Why This Matters -->
+        <div class="slide">
+            <h1>
+                <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+                </svg>
+                Why This Matters
+            </h1>
+            <p class="lead">The $14.5B IoT problem we're solving today</p>
+            
+            <div class="grid">
+                <div class="card">
+                    <h3>The Problem</h3>
+                    <p>60% of IoT devices never receive security updates after deployment</p>
+                </div>
+                <div class="card">
+                    <h3>The Risk</h3>
+                    <p>Unpatched devices become attack vectors, costing billions annually</p>
+                </div>
+                <div class="card">
+                    <h3>The Solution</h3>
+                    <p>Secure OTA updates that are as reliable as smartphone updates</p>
+                </div>
+            </div>
+            
+            <div class="alert alert-success">
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                    <path d="M22 4L12 14.01l-3-3"/>
+                </svg>
+                <div>
+                    <strong>What You'll Build:</strong> A production-ready OTA system that prevents these problems
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: BeagleY-AI Deep Dive -->
+        <div class="slide">
+            <h1>
+                <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="4" y="4" width="16" height="16" rx="2"/>
+                    <path d="M9 9h6M9 12h6M9 15h3"/>
+                </svg>
+                BeagleY-AI: Industrial Edge Computing
+            </h1>
+            <p class="lead">Why this board is perfect for production OTA</p>
+            
+            <div class="two-column">
+                <div>
+                    <h3>Compute Power</h3>
+                    <table class="specs-table">
+                        <tr>
+                            <td>Processor</td>
+                            <td>TI AM67A (Quad Cortex-A53 @ 1.4GHz)</td>
+                        </tr>
+                        <tr>
+                            <td>AI/ML</td>
+                            <td>4 TOPS, Dual C7x DSPs</td>
+                        </tr>
+                        <tr>
+                            <td>Memory</td>
+                            <td>4GB LPDDR4</td>
+                        </tr>
+                        <tr>
+                            <td>Storage</td>
+                            <td>16GB eMMC + microSD</td>
+                        </tr>
+                    </table>
+                </div>
+                <div>
+                    <h3>Why BeagleY-AI for OTA?</h3>
+                    <ul>
+                        <li><strong>Dual boot sources:</strong> eMMC + SD for A/B updates</li>
+                        <li><strong>Secure boot capable:</strong> Hardware crypto acceleration</li>
+                        <li><strong>Industrial temp range:</strong> -40°C to 85°C</li>
+                        <li><strong>10-year availability:</strong> No supply chain surprises</li>
+                        <li><strong>Open hardware:</strong> Full documentation available</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: Thistle Platform Architecture -->
+        <div class="slide">
+            <h1>
+                <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                    <path d="M2 17l10 5 10-5"/>
+                    <path d="M2 12l10 5 10-5"/>
+                </svg>
+                Thistle: Enterprise OTA Infrastructure
+            </h1>
+            <p class="lead">How Fortune 500 companies update millions of devices</p>
+            
+            <div class="grid">
+                <div class="feature-card">
+                    <div class="icon">
+                        <svg fill="white" viewBox="0 0 24 24">
+                            <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/>
+                        </svg>
+                    </div>
+                    <div class="feature-content">
+                        <h3>Security Core</h3>
+                        <p>Ed25519 signatures, TLS 1.3, hardware key storage support</p>
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="icon">
+                        <svg fill="white" viewBox="0 0 24 24">
+                            <path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/>
+                        </svg>
+                    </div>
+                    <div class="feature-content">
+                        <h3>Update Types</h3>
+                        <p>File, A/B rootfs, bootloader, delta compression</p>
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="icon">
+                        <svg fill="white" viewBox="0 0 24 24">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                        </svg>
+                    </div>
+                    <div class="feature-content">
+                        <h3>Reliability</h3>
+                        <p>Power-loss safe, automatic rollback, health monitoring</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="alert alert-info">
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M12 6v6l4 2"/>
+                </svg>
+                <div>
+                    <strong>Used in Production:</strong> Tesla, BMW, and 50+ IoT companies trust Thistle for critical updates
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: How File Updates Work -->
+        <div class="slide">
+            <h1>
+                <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                    <polyline points="14 2 14 8 20 8"/>
+                </svg>
+                File Update Deep Dive
+            </h1>
+            <p class="lead">Understanding atomic file operations</p>
+            
+            <div class="flow-diagram">
+                <div class="flow-item">
+                    <strong>1. Download</strong>
+                    <p style="font-size: 0.9rem;">Fetch to temp location</p>
+                </div>
+                <span class="flow-arrow">→</span>
+                <div class="flow-item">
+                    <strong>2. Verify</strong>
+                    <p style="font-size: 0.9rem;">Check signature</p>
+                </div>
+                <span class="flow-arrow">→</span>
+                <div class="flow-item">
+                    <strong>3. Stage</strong>
+                    <p style="font-size: 0.9rem;">Prepare new files</p>
+                </div>
+                <span class="flow-arrow">→</span>
+                <div class="flow-item">
+                    <strong>4. Atomic Swap</strong>
+                    <p style="font-size: 0.9rem;">rename() syscall</p>
+                </div>
+            </div>
+            
+            <div class="two-column">
+                <div class="card">
+                    <h3>Why Atomic Updates Matter</h3>
+                    <ul>
+                        <li>Power loss = no corruption</li>
+                        <li>All-or-nothing guarantee</li>
+                        <li>No partial updates</li>
+                        <li>Instant rollback possible</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>What We'll Update Today</h3>
+                    <ul>
+                        <li>Single file (blink.sh)</li>
+                        <li>Target: /opt/example/</li>
+                        <li>Size: ~200 bytes</li>
+                        <li>Effect: GPIO LED control</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: File Update vs Full OTA -->
+        <div class="slide">
+            <h1>
+                <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                    <polyline points="14 2 14 8 20 8"/>
+                    <path d="M12 18v-6m-3 3l3-3 3 3"/>
+                </svg>
+                File Updates vs. Secure Boot OTA
+            </h1>
+            <p class="lead">Understanding what we're building today</p>
+            
+            <div class="two-column">
+                <div class="card">
+                    <h3>Today: File Update Mode</h3>
+                    <ul>
+                        <li>Deploy individual files (scripts, configs)</li>
+                        <li>Signed manifests, not raw files</li>
+                        <li>Cryptographic verification</li>
+                        <li>Atomic file operations</li>
+                        <li>Perfect for application updates</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>Next Month: Full A/B OTA</h3>
+                    <ul>
+                        <li>Replace entire rootfs/kernel</li>
+                        <li>Dual partition switching</li>
+                        <li>Verified boot chain</li>
+                        <li>Hardware-level security</li>
+                        <li>Automatic rollback on failure</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div style="margin-top: 1.5rem; padding: 1.5rem; background: var(--bg-secondary); border-radius: 12px;">
+                <h3>What Makes Even File Updates Secure</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1rem;">
+                    <div>
+                        <strong>Signed Manifests</strong>
+                        <p style="font-size: 0.95rem;">Every update has Ed25519 signature - devices reject unsigned/tampered files</p>
+                    </div>
+                    <div>
+                        <strong>Atomic Operations</strong>
+                        <p style="font-size: 0.95rem;">Files deploy completely or not at all - no corruption on power loss</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="alert alert-info">
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M12 6v6l4 2"/>
+                </svg>
+                <div>
+                    <strong>Key Insight:</strong> Even our "simple" LED blink uses the same security pipeline as production IoT devices - signed release → cloud 
+distribution → verification → atomic delivery
+                </div>
+            </div>
+        </div>
+        <div class="slide">
+            <h1>
+                <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 11H4a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h5m10-11h5a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-5m-6-11V2m0 20v-2"/>
+                    <circle cx="12" cy="12" r="3"/>
+                </svg>
+                Pre-Flight Checklist
+            </h1>
+            <p class="lead">5-minute setup before we begin</p>
+            
+            <div class="grid">
+                <div class="card">
+                    <h3>Hardware (Required)</h3>
+                    <ul class="compact-list">
+                        <li>BeagleY-AI board</li>
+                        <li>32GB+ microSD card</li>
+                        <li>USB-C cable (data capable)</li>
+                        <li>Computer with USB port</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>Hardware (Optional)</h3>
+                    <ul class="compact-list">
+                        <li>LED (any color)</li>
+                        <li>2.2kΩ resistor</li>
+                        <li>Breadboard/jumpers</li>
+                        <li>Ethernet cable</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>Software & Accounts</h3>
+                    <ul class="compact-list">
+                        <li>Thistle account (free)</li>
+                        <li>bb-imager v1.0+</li>
+                        <li>Terminal/SSH client</li>
+                        <li>Text editor</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="alert alert-warning">
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="12" y1="8" x2="12" y2="12"/>
+                    <line x1="12" y1="16" x2="12.01" y2="16"/>
+                </svg>
+                <div>
+                    <strong>Action Required:</strong> Create Thistle account at app.thistle.tech → Create Project → Copy API Token
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 7: Download bb-imager -->
+        <div class="slide">
+            <h1>
+                <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="7 10 12 15 17 10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                Step 1A: Get bb-imager Tool
+            </h1>
+            <p class="lead">BeagleBoard's official SD card imaging software</p>
+            
+            <div class="grid">
+                <div class="card">
+                    <h3>Windows</h3>
+                    <p><a href="https://www.beagleboard.org/distros/beagley-ai-bb-imager-xfce" style="color: var(--primary);">bb-imager-1.0.0-windows-x64.exe</a></p>
+                    <p style="font-size: 0.9rem; color: var(--text-muted);">Requires Windows 10 or later</p>
+                </div>
+                
+                <div class="card">
+                    <h3>macOS</h3>
+                    <p><a href="https://www.beagleboard.org/distros/beagley-ai-bb-imager-xfce" style="color: var(--primary);">bb-imager-1.0.0-mac-x64.dmg</a></p>
+                    <p style="font-size: 0.9rem; color: var(--text-muted);">macOS 10.15 or later</p>
+                </div>
+                
+                <div class="card">
+                    <h3>Linux</h3>
+                    <p><a href="https://www.beagleboard.org/distros/beagley-ai-bb-imager-xfce" style="color: var(--primary);">bb-imager-1.0.0-linux-x64.AppImage</a></p>
+                    <p style="font-size: 0.9rem; color: var(--text-muted);">chmod +x then run</p>
+                </div>
+            </div>
+            
+            <div style="margin-top: 2rem; padding: 2rem; background: var(--bg-secondary); border-radius: 12px; text-align: center;">
+                <h3>What You'll See When You Open bb-imager</h3>
+                <div style="border: 2px solid var(--primary); border-radius: 8px; padding: 2rem; background: white;">
+                    <p><strong>Three Big Buttons:</strong></p>
+                    <div style="display: flex; justify-content: center; gap: 1rem; margin-top: 1rem;">
+                        <div style="padding: 1rem 2rem; background: #c8523b; color: white; border-radius: 8px;">CHOOSE DEVICE</div>
+                        <div style="padding: 1rem 2rem; background: #c8523b; color: white; border-radius: 8px;">CHOOSE OS</div>
+                        <div style="padding: 1rem 2rem; background: #c8523b; color: white; border-radius: 8px;">CHOOSE STORAGE</div>
+                    </div>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 1rem;">
+                        Interface similar to Raspberry Pi Imager but customized for BeagleBoards
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: Select Device -->
+        <div class="slide">
+            <h1>
+                <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                    <circle cx="12" cy="12" r="2"/>
+                </svg>
+                Step 1B: Choose Your Device
+            </h1>
+            <p class="lead">Select the correct BeagleBoard model</p>
+            
+            <div style="padding: 2rem; background: var(--bg-secondary); border-radius: 12px;">
+                <h3>Click "CHOOSE DEVICE" Button</h3>
+                
+                <div style="margin-top: 1.5rem; background: white; border: 2px solid var(--border); border-radius: 8px; padding: 1.5rem;">
+                    <p><strong>Device Selection Menu:</strong></p>
+                    <div style="margin: 1rem 0; padding: 1rem; background: var(--card-bg); border-radius: 8px;">
+                        <p>BeagleBone</p>
+                        <p>BeaglePlay</p>
+                        <p style="background: var(--primary); color: white; padding: 0.5rem; border-radius: 4px;"><strong>→ BeagleY-AI</strong></p>
+                        <p>BeagleV</p>
+                        <p>PocketBeagle</p>
+                    </div>
+                    <p style="color: var(--success);"><strong>✓ Select: BeagleY-AI</strong></p>
+                </div>
+            </div>
+            
+            <div class="alert alert-warning">
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="12" y1="8" x2="12" y2="12"/>
+                    <line x1="12" y1="16" x2="12.01" y2="16"/>
+                </svg>
+                <div>
+                    <strong>Important:</strong> Make sure you select BeagleY-AI, not BeagleBone or other models
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 9: Select OS -->
+        <div class="slide">
+            <h1>
+                <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M2 12h20M12 2c4.5 0 8 4.5 8 10s-3.5 10-8 10-8-4.5-8-10 3.5-10 8-10z"/>
+                </svg>
+                Step 1C: Choose Operating System
+            </h1>
+            <p class="lead">Select the recommended Debian image</p>
+            
+            <div style="padding: 2rem; background: var(--bg-secondary); border-radius: 12px;">
+                <h3>Click "CHOOSE OS" Button</h3>
+                
+                <div style="margin-top: 1.5rem; background: white; border: 2px solid var(--border); border-radius: 8px; padding: 1.5rem;">
+                    <p><strong>Operating System Selection:</strong></p>
+                    <div style="margin: 1rem 0; padding: 1rem; background: var(--card-bg); border-radius: 8px;">
+                        <p style="background: var(--primary); color: white; padding: 0.5rem; border-radius: 4px;">
+                            <strong>→ BeagleY-AI Debian 12 (Bookworm) - XFCE Desktop (Recommended)</strong><br>
+                            <span style="font-size: 0.85rem;">2.1 GB download - Full desktop environment with development tools</span>
+                        </p>
+                        <p style="margin-top: 0.5rem;">BeagleY-AI Debian 12 - Minimal (Advanced users)</p>
+                        <p>Other OS options...</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="alert alert-info">
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M12 6v6l4 2"/>
+                </svg>
+                <div>
+                    The XFCE Desktop version includes all drivers and tools needed for OTA development
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 10: Storage and Settings Button -->
+        <div class="slide">
+            <h1>
+                <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="11" width="18" height="10" rx="2" ry="2"/>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                </svg>
+                Step 1D: Select Storage & Find Settings
+            </h1>
+            <p class="lead">Choose your SD card and locate the customization settings</p>
+            
+            <div style="padding: 2rem; background: var(--bg-secondary); border-radius: 12px;">
+                <h3>1. Click "CHOOSE STORAGE"</h3>
+                <div style="background: white; border: 2px solid var(--border); border-radius: 8px; padding: 1.5rem; margin-top: 1rem;">
+                    <p>Select your microSD card (32GB minimum)</p>
+                    <div style="padding: 0.75rem; background: #fee; border-radius: 4px; margin-top: 0.5rem;">
+                        <strong>⚠ Warning:</strong> All data on the card will be erased!
+                    </div>
+                </div>
+                
+                <h3 style="margin-top: 2rem;">2. BEFORE Writing - Click Settings Gear</h3>
+                <div style="background: white; border: 2px solid var(--primary); border-radius: 8px; padding: 1.5rem; margin-top: 1rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <p><strong>Look for the gear icon ⚙ in the corner</strong></p>
+                        <div style="width: 40px; height: 40px; background: var(--primary); border-radius: 8px; display: flex; align-items: center; justify-content: 
+center;">
+                            <svg width="24" height="24" fill="white" viewBox="0 0 24 24">
+                                <path d="M12 15.5A3.5 3.5 0 0 1 8.5 12A3.5 3.5 0 0 1 12 8.5a3.5 3.5 0 0 1 3.5 3.5a3.5 3.5 0 0 1-3.5 
+3.5m7.43-2.53c.04-.32.07-.64.07-.97c0-.33-.03-.65-.07-.97l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 
+1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65A.488.488 0 0 0 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 
+3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.97c0 .33.03.65.07.97l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 
+2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.23.09.49 0 .61-.22l2-3.46c.13-.22.07-.49-.12-.64l-2.11-1.65Z"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <p style="color: var(--danger); font-weight: 600; margin-top: 1rem;">
+                        DO NOT click Write yet! We need to configure SSH and networking first!
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 11: OS Customization Part 1 -->
+        <div class="slide">
+            <h1>
+                <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 15V3m-6 6l6-6 6 6M12 21c-4 0-7-2-7-5s3-5 7-5 7 2 7 5-3 5-7 5z"/>
+                </svg>
+                Step 1E: Enable SSH Access
+            </h1>
+            <p class="lead">Configure remote access in OS Customization Settings</p>
+            
+            <div style="padding: 2rem; background: var(--bg-secondary); border-radius: 12px;">
+                <h3>In the OS Customization Window:</h3>
+                
+                <div style="background: white; border: 2px solid var(--border); border-radius: 8px; padding: 2rem; margin-top: 1.5rem;">
+                    <div style="margin-bottom: 1.5rem;">
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <div style="width: 24px; height: 24px; border: 2px solid var(--primary); border-radius: 4px; background: var(--primary);">
+                                <svg width="20" height="20" fill="white" viewBox="0 0 24 24" style="margin: 2px;">
+                                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                                </svg>
+                            </div>
+                            <strong>Enable SSH</strong>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-left: 2.5rem;">
+                        <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+                            <div style="width: 16px; height: 16px; border: 2px solid var(--primary); border-radius: 50%; background: var(--primary);"></div>
+                            <span>Use password authentication</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                            <div style="width: 16px; height: 16px; border: 2px solid #ccc; border-radius: 50%;"></div>
+                            <span style="color: var(--text-muted);">Allow public-key authentication only</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="alert alert-info" style="margin-top: 1.5rem;">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M12 6v6l4 2"/>
+                    </svg>
+                    <div>
+                        SSH allows you to connect remotely without needing a keyboard and monitor
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 12: OS Customization Part 2 -->
+        <div class="slide">
+            <h1>
+                <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                    <circle cx="12" cy="7" r="4"/>
+                </svg>
+                Step 1F: Set Username & Password
+            </h1>
+            <p class="lead">Create login credentials for your BeagleY-AI</p>
+            
+            <div style="padding: 2rem; background: var(--bg-secondary); border-radius: 12px;">
+                <div style="background: white; border: 2px solid var(--border); border-radius: 8px; padding: 2rem;">
+                    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem;">
+                        <div style="width: 24px; height: 24px; border: 2px solid var(--primary); border-radius: 4px; background: var(--primary);">
+                            <svg width="20" height="20" fill="white" viewBox="0 0 24 24" style="margin: 2px;">
+                                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                            </svg>
+                        </div>
+                        <strong>Set username and password</strong>
+                    </div>
+                    
+                    <div style="margin-left: 2.5rem;">
+                        <div style="margin-bottom: 1rem;">
+                            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Username:</label>
+                            <div style="padding: 0.75rem; background: var(--card-bg); border: 1px solid var(--border); border-radius: 4px; font-family: monospace;">
+                                debian
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Password:</label>
+                            <div style="padding: 0.75rem; background: var(--card-bg); border: 1px solid var(--border); border-radius: 4px; font-family: monospace;">
+                                [choose-a-strong-password]
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="alert alert-warning" style="margin-top: 1.5rem;">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                        <line x1="12" y1="9" x2="12" y2="13"/>
+                        <line x1="12" y1="17" x2="12.01" y2="17"/>
+                    </svg>
+                    <div>
+                        Write down this password! You'll need it to SSH into the device.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 13: WiFi Configuration -->
+        <div class="slide">
+            <h1>
+                <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M5 12.55a11 11 0 0 1 14.08 0"/>
+                    <path d="M1.42 9a16 16 0 0 1 21.16 0"/>
+                    <path d="M8.53 16.11a6 6 0 0 1 6.95 0"/>
+                    <line x1="12" y1="20" x2="12.01" y2="20"/>
+                </svg>
+                Step 1G: Configure WiFi (Optional)
+            </h1>
+            <p class="lead">Pre-configure wireless network for headless setup</p>
+            
+            <div style="padding: 2rem; background: var(--bg-secondary); border-radius: 12px;">
+                <div style="background: white; border: 2px solid var(--border); border-radius: 8px; padding: 2rem;">
+                    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem;">
+                        <div style="width: 24px; height: 24px; border: 2px solid var(--primary); border-radius: 4px; background: var(--primary);">
+                            <svg width="20" height="20" fill="white" viewBox="0 0 24 24" style="margin: 2px;">
+                                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                            </svg>
+                        </div>
+                        <strong>Configure wireless LAN</strong>
+                    </div>
+                    
+                    <div style="margin-left: 2.5rem;">
+                        <div style="display: grid; gap: 1rem;">
+                            <div>
+                                <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">SSID:</label>
+                                <div style="padding: 0.75rem; background: var(--card-bg); border: 1px solid var(--border); border-radius: 4px; font-family: monospace;">
+                                    your-wifi-network-name
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Password:</label>
+                                <div style="padding: 0.75rem; background: var(--card-bg); border: 1px solid var(--border); border-radius: 4px; font-family: monospace;">
+                                    your-wifi-password
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Wireless LAN country:</label>
+                                <div style="padding: 0.75rem; background: var(--card-bg); border: 1px solid var(--border); border-radius: 4px; font-family: monospace;">
+                                    US
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <p style="text-align: center; margin-top: 1.5rem; color: var(--text-muted);">
+                    Skip this section if you're using Ethernet or USB networking only
+                </p>
+            </div>
+        </div>
+
+        <!-- Slide 14: Set Hostname -->
+        <div class="slide">
+            <h1>
+                <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="2" y="7" width="20" height="14" rx="2" ry="2"/>
+                    <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+                </svg>
+                Step 1H: Set Device Hostname
+            </h1>
+            <p class="lead">Give your BeagleY-AI a network name for easy access</p>
+            
+            <div style="padding: 2rem; background: var(--bg-secondary); border-radius: 12px;">
+                <div style="background: white; border: 2px solid var(--border); border-radius: 8px; padding: 2rem;">
+                    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem;">
+                        <div style="width: 24px; height: 24px; border: 2px solid var(--primary); border-radius: 4px; background: var(--primary);">
+                            <svg width="20" height="20" fill="white" viewBox="0 0 24 24" style="margin: 2px;">
+                                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                            </svg>
+                        </div>
+                        <strong>Set hostname</strong>
+                    </div>
+                    
+                    <div style="margin-left: 2.5rem;">
+                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Hostname:</label>
+                        <div style="padding: 0.75rem; background: var(--card-bg); border: 1px solid var(--border); border-radius: 4px; font-family: monospace; font-size: 
+1.1rem;">
+                            beagley-ota
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 2rem; padding: 1.5rem; background: white; border: 2px solid var(--success); border-radius: 8px;">
+                    <h3 style="color: var(--success); margin-top: 0;">What this enables:</h3>
+                    <p>Instead of finding the IP address, you can connect using:</p>
+                    <div style="padding: 0.75rem; background: var(--bg-code); border-radius: 4px; font-family: monospace; margin-top: 0.5rem;">
+                        ssh debian@beagley-ota.local
+                    </div>
+                </div>
+                
+                <div style="text-align: center; margin-top: 2rem;">
+                    <div style="display: inline-block; padding: 1rem 2rem; background: var(--primary); color: white; border-radius: 8px; font-weight: 600;">
+                        Click "SAVE" to apply all settings
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 15: Write and Boot -->
+        <div class="slide">
+            <h1>
+                <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <polyline points="12 6 12 12 16 14"/>
+                </svg>
+                Step 1I: Write Image to SD Card
+            </h1>
+            <p class="lead">Flash the configured image and boot your BeagleY-AI</p>
+            
+            <div class="grid">
+                <div class="card">
+                    <h3>1. Start Writing</h3>
+                    <p>Click the "WRITE" button</p>
+                    <p>Confirm when prompted</p>
+                    <p>Enter admin password if asked</p>
+                </div>
+                
+                <div class="card">
+                    <h3>2. Progress (10-15 min)</h3>
+                    <div style="margin: 1rem 0;">
+                        <div style="background: #e0e0e0; border-radius: 4px; height: 20px; position: relative;">
+                            <div style="background: var(--primary); border-radius: 4px; height: 100%; width: 75%;"></div>
+                        </div>
+                        <p style="font-size: 0.85rem; margin-top: 0.5rem;">Downloading... Writing... Verifying...</p>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h3>3. Complete!</h3>
+                    <p>"Write Successful" message</p>
+                    <p>Remove SD card when safe</p>
+                    <p>Insert into BeagleY-AI</p>
+                </div>
+            </div>
+            
+            <div style="margin-top: 2rem; padding: 1.5rem; background: var(--bg-secondary); border-radius: 12px;">
+                <h3>First Boot Sequence</h3>
+                <ol style="margin-left: 1.5rem;">
+                    <li>Insert SD card into BeagleY-AI slot (push until click)</li>
+                    <li>Connect power (USB-C or 5V/3A supply)</li>
+                    <li>Wait 60-90 seconds for first boot</li>
+                    <li>LEDs will indicate boot progress</li>
+                </ol>
+            </div>
+        </div>
+
+        <!-- Slide 16: Connect via SSH (renumbered) -->
+        <div class="slide">
+            <h1>
+                <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="7 10 12 15 17 10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                Step 1A: Download bb-imager
+            </h1>
+            <p class="lead">BeagleBoard's official imaging tool - like Raspberry Pi Imager but better</p>
+            
+            <div class="two-column">
+                <div>
+                    <h3>Download for Your OS</h3>
+                    <div class="card">
+                        <p><strong>🪟 Windows:</strong><br>
+                        <a href="https://www.beagleboard.org/bb-imager" style="color: var(--primary);">bb-imager-1.0.0-windows-x64.exe</a></p>
+                        
+                        <p><strong>🍎 macOS:</strong><br>
+                        <a href="https://www.beagleboard.org/bb-imager" style="color: var(--primary);">bb-imager-1.0.0-mac-x64.dmg</a></p>
+                        
+                        <p><strong>🐧 Linux:</strong><br>
+                        <a href="https://www.beagleboard.org/bb-imager" style="color: var(--primary);">bb-imager-1.0.0-linux-x64.AppImage</a></p>
+                    </div>
+                    
+                    <h3>System Requirements</h3>
+                    <ul>
+                        <li>8GB+ RAM recommended</li>
+                        <li>Admin/sudo privileges</li>
+                        <li>SD card reader</li>
+                    </ul>
+                </div>
+                <div>
+                    <div class="card" style="background: var(--bg-secondary); padding: 2rem; text-align: center;">
+                        <h3>bb-imager Main Window</h3>
+                        <div style="border: 2px solid var(--border); border-radius: 8px; padding: 2rem; background: white;">
+                            <p style="color: var(--text-muted); font-style: italic;">
+                                [Image: bb-imager main window showing three buttons]<br>
+                                CHOOSE DEVICE<br>
+                                CHOOSE OS<br>
+                                CHOOSE STORAGE<br>
+                                <br>
+                                Source: docs.beagleboard.org/boards/beagley/ai/02-quick-start.html
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="alert alert-info">
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M12 6v6l4 2"/>
+                </svg>
+                <div>
+                    <strong>Why bb-imager?</strong> It automatically downloads the latest BeagleY-AI image and includes OS customization for headless setup - critical for 
+OTA deployments.
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: Select Device and OS -->
+        <div class="slide">
+            <h1>
+                <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                    <line x1="12" y1="3" x2="12" y2="9"/>
+                    <line x1="12" y1="15" x2="12" y2="21"/>
+                </svg>
+                Step 1B: Select Device and OS
+            </h1>
+            <p class="lead">Choose the correct board model and operating system</p>
+            
+            <div class="grid">
+                <div class="card">
+                    <h3>1. Click "CHOOSE DEVICE"</h3>
+                    <div style="background: white; padding: 1rem; border: 1px solid var(--border); border-radius: 8px;">
+                        <p>Select: <strong>BeagleY-AI</strong></p>
+                        <p style="font-size: 0.9rem; color: var(--text-muted);">
+                            Not: BeagleBone, BeagleV, or BeaglePlay
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h3>2. Click "CHOOSE OS"</h3>
+                    <div style="background: white; padding: 1rem; border: 1px solid var(--border); border-radius: 8px;">
+                        <p>Select: <strong>BeagleY-AI Debian 12 (Bookworm) - XFCE Desktop</strong></p>
+                        <p style="font-size: 0.9rem; color: var(--text-muted);">
+                            Latest stable release with desktop environment
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h3>3. Click "CHOOSE STORAGE"</h3>
+                    <div style="background: white; padding: 1rem; border: 1px solid var(--border); border-radius: 8px;">
+                        <p>Select: <strong>Your 32GB+ microSD card</strong></p>
+                        <p style="font-size: 0.9rem; color: var(--text-muted);">
+                            ⚠️ All data will be erased!
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="margin-top: 2rem; padding: 1.5rem; background: var(--bg-secondary); border-radius: 12px;">
+                <h3>What You Should See</h3>
+                <div style="border: 2px solid var(--border); border-radius: 8px; padding: 1.5rem; background: white;">
+                    <p style="color: var(--text-muted); text-align: center;">
+                        [Image: bb-imager with selections made]<br><br>
+                        Device: BeagleY-AI<br>
+                        OS: BeagleY-AI Debian 12 (Bookworm) - XFCE (2.1 GB)<br>
+                        Storage: Generic MassStorageClass (31.9 GB)<br><br>
+                        ⚙️ Settings button visible in corner
+                    </p>
+                </div>
+            </div>
+            
+            <div class="alert alert-warning">
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="12" y1="8" x2="12" y2="12"/>
+                    <line x1="12" y1="16" x2="12.01" y2="16"/>
+                </svg>
+                <div>
+                    <strong>STOP!</strong> Before clicking WRITE, we need to configure OS customization for headless setup. Click the ⚙️ gear icon!
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 9: OS Customization -->
+        <div class="slide">
+            <h1>
+                <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M12 8v4M12 16h.01"/>
+                    <path d="M15.7 15.7L19 19M8.3 8.3L5 5M15.7 8.3L19 5M8.3 15.7L5 19"/>
+                </svg>
+                Step 1C: OS Customization (Critical!)
+            </h1>
+            <p class="lead">Pre-configure WiFi, SSH, and hostname for headless operation</p>
+            
+            <h3>Click the ⚙️ Settings Icon → OS Customization</h3>
+            
+            <div class="two-column">
+                <div>
+                    <div class="card">
+                        <h3>✅ Enable SSH</h3>
+                        <div style="background: white; padding: 1rem; border-radius: 8px;">
+                            <p>☑ Enable SSH<br>
+                            ⚪ Use password authentication<br>
+                            ⚪ Allow public-key only</p>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>✅ Set Username and Password</h3>
+                        <div style="background: white; padding: 1rem; border-radius: 8px;">
+                            <p>Username: <code>debian</code><br>
+                            Password: <code>[create-strong-password]</code></p>
+                            <p style="font-size: 0.85rem; color: var(--text-muted);">
+                                Write this down - you'll need it for SSH!
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <div class="card">
+                        <h3>✅ Configure Wireless LAN</h3>
+                        <div style="background: white; padding: 1rem; border-radius: 8px;">
+                            <p>SSID: <code>your-wifi-network</code><br>
+                            Password: <code>your-wifi-password</code><br>
+                            Country: <code>US</code> (or your country)</p>
+                            <p style="font-size: 0.85rem; color: var(--text-muted);">
+                                Skip if using Ethernet only
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>✅ Set Hostname</h3>
+                        <div style="background: white; padding: 1rem; border-radius: 8px;">
+                            <p>Hostname: <code>beagley-ota</code></p>
+                            <p style="font-size: 0.85rem; color: var(--text-muted);">
+                                Enables: ssh debian@beagley-ota.local
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="alert alert-success">
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20 6L9 17l-5-5"/>
+                </svg>
+                <div>
+                    <strong>What this does:</strong> Creates <code>/boot/sysconf.txt</code> on the SD card. On first boot, BeagleY-AI reads this file and auto-configures 
+networking, SSH, and hostname. Without this, you need a keyboard and monitor!
+                </div>
+            </div>
+            
+            <div style="text-align: center; margin-top: 1.5rem;">
+                <div class="card" style="display: inline-block; padding: 1rem 2rem;">
+                    <strong>Click "SAVE" to apply customization settings</strong>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 10: Write and Boot -->
+        <div class="slide">
+            <h1>
+                <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <polyline points="12 6 12 12 16 14"/>
+                </svg>
+                Step 1D: Write Image and First Boot
+            </h1>
+            <p class="lead">Flash the card and boot your configured BeagleY-AI</p>
+            
+            <div class="two-column">
+                <div>
+                    <h3>Write the Image</h3>
+                    <div class="card">
+                        <p><strong>1. Click "WRITE"</strong></p>
+                        <p>Confirm: "Are you sure?" → Yes</p>
+                        <p>Enter admin/sudo password if prompted</p>
+                        <br>
+                        <p><strong>2. Wait 10-15 minutes</strong></p>
+                        <div style="background: white; padding: 0.75rem; border-radius: 8px;">
+                            <p style="font-size: 0.9rem;">
+                                Downloading... (2.1 GB)<br>
+                                Writing... ████████░░ 80%<br>
+                                Verifying... 
+                            </p>
+                        </div>
+                        <br>
+                        <p><strong>3. Complete!</strong></p>
+                        <p>"Write Successful" → Remove SD card</p>
+                    </div>
+                </div>
+                
+                <div>
+                    <h3>First Boot</h3>
+                    <div class="card">
+                        <p><strong>1. Insert SD Card</strong></p>
+                        <p>Push until it clicks into BeagleY-AI slot</p>
+                        <br>
+                        <p><strong>2. Connect Power</strong></p>
+                        <p>USB-C cable (data+power) or 5V/3A supply</p>
+                        <br>
+                        <p><strong>3. Wait for Boot</strong></p>
+                        <p>LEDs will flash during boot sequence:<br>
+                        • Power LED: Solid red<br>
+                        • Activity LED: Flashing green<br>
+                        • Boot complete: ~60-90 seconds</p>
+                        <br>
+                        <p><strong>4. Find Your Board</strong></p>
+                        <div style="background: white; padding: 0.5rem; border-radius: 8px;">
+                            <code>ping beagley-ota.local</code>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="alert alert-info">
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M12 6v6l4 2"/>
+                </svg>
+                <div>
+                    <strong>First boot takes longer!</strong> The BeagleY-AI expands the filesystem and applies your customization settings. Subsequent boots are much 
+faster (~30 seconds).<br>
+                    <a href="https://docs.beagleboard.org/boards/beagley/ai/02-quick-start.html#flashing-an-image" style="color: var(--primary);">📖 Complete Flashing Guide 
+with Screenshots</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 11: Connect via SSH (previously slide 8) -->
+        <div class="slide">
+            <h1>
+                <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                    <line x1="9" y1="9" x2="15" y2="9"/>
+                    <line x1="9" y1="15" x2="15" y2="15"/>
+                </svg>
+                Smart Flashing with bb-imager
+            </h1>
+            <p class="lead">Pre-configure everything for headless operation</p>
+            
+            <h3>Step 1: Flash with bb-imager v1.0.0+</h3>
+            <div class="code">
+<span class="comment"># Download from: https://www.beagleboard.org/bb-imager</span>
+<span class="comment"># In bb-imager GUI:</span>
+1. CHOOSE DEVICE → BeagleY-AI
+2. CHOOSE OS → BeagleOS (Debian 12 Bookworm - XFCE Desktop)
+3. CHOOSE STORAGE → Your microSD card (verify it's the right one!)
+            </div>
+            
+            <h3>Step 2: OS Customization Settings (⚙️ Icon)</h3>
+            <div class="code">
+<span class="comment"># CRITICAL: Click gear icon BEFORE writing!</span>
+<span class="comment"># This modifies /boot/sysconf.txt on the SD card</span>
+
+[✓] <span class="command">Enable SSH</span>
+    └─ Use password authentication
+
+[✓] <span class="command">Set username and password</span>
+    └─ Username: <span class="string">debian</span>
+    └─ Password: <span class="string">[choose-strong-password]</span>
+
+[✓] <span class="command">Configure wireless LAN</span> <span class="comment"># Skip if using Ethernet</span>
+    └─ SSID: <span class="string">your-wifi-network</span>
+    └─ Password: <span class="string">your-wifi-password</span>
+    └─ Country: <span class="string">US</span> <span class="comment"># Sets regulatory domain</span>
+
+[✓] <span class="command">Set hostname</span>
+    └─ Hostname: <span class="string">beagley-ota</span> <span class="comment"># Enables .local mDNS</span>
+            </div>
+            
+            <div class="alert alert-info">
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M12 6v6l4 2"/>
+                </svg>
+                <div>
+                    <strong>Why this matters:</strong> These settings modify <code>/boot/sysconf.txt</code> which the BeagleY-AI reads on first boot to auto-configure 
+networking and SSH. Without this, you need keyboard/monitor for initial setup.<br>
+                    <a href="https://docs.beagleboard.org/boards/beagley/ai/02-quick-start.html#flashing" style="color: var(--primary);">📖 BeagleY-AI Flashing Guide</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 16: Connect via SSH -->
+        <div class="slide">
+            <h1>
+                <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/>
+                </svg>
+                Connect to Your BeagleY-AI
+            </h1>
+            <p class="lead">Multiple ways to access your board</p>
+            
+            <div class="two-column">
+                <div>
+                    <h3>USB Network (Easiest)</h3>
+                    <div class="code">
+<span class="comment"># Linux/Mac:</span>
+ssh debian@192.168.7.2
+
+<span class="comment"># Windows:</span>
+ssh debian@192.168.6.2
+                    </div>
+                </div>
+                <div>
+                    <h3>Network (WiFi/Ethernet)</h3>
+                    <div class="code">
+<span class="comment"># Using hostname:</span>
+ssh debian@beagley-ota.local
+
+<span class="comment"># Or IP address</span>
+ssh debian@[IP-ADDRESS]
+                    </div>
+                </div>
+            </div>
+            
+            <h3>Verify Connection</h3>
+            <div class="code">
+<span class="command">debian@beagley-ota:~$</span> uname -a
+Linux beagley-ota 5.10.168-ti-arm64-r103 #1bookworm SMP armv71 GNU/Linux
+            </div>
+        </div>
+
+        <!-- Slide 17: Download TRH -->
+        <div class="slide">
+            <h1>
+                <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                    <polyline points="14 2 14 8 20 8"/>
+                    <line x1="16" y1="13" x2="8" y2="13"/>
+                    <line x1="16" y1="17" x2="8" y2="17"/>
+                </svg>
+                Install Release Helper (Your Computer)
+            </h1>
+            <p class="lead">TRH packages and cryptographically signs your updates</p>
+            
+            <div class="two-column">
+                <div>
+                    <h3>Linux/macOS Installation</h3>
+                    <div class="code">
+<span class="comment"># TRH is a single static binary - no dependencies!</span>
+<span class="comment"># Latest: https://downloads.thistle.tech/embedded-client/</span>
+
+VER=1.5.0
+<span class="comment"># For Linux x86_64:</span>
+ARCH=x86_64-unknown-linux-musl
+<span class="comment"># For macOS:</span>
+ARCH=x86_64-apple-darwin <span class="comment"># Intel</span>
+ARCH=aarch64-apple-darwin <span class="comment"># M1/M2</span>
+
+<span class="comment"># Download (75MB)</span>
+curl -LO "https://downloads.thistle.tech/\
+embedded-client/$VER/trh-$VER-$ARCH.gz"
+
+<span class="comment"># Extract and install</span>
+gunzip trh-$VER-$ARCH.gz
+chmod +x trh-$VER-$ARCH
+sudo mv trh-$VER-$ARCH /usr/local/bin/trh
+
+<span class="comment"># Verify (should show subcommands)</span>
+trh --help | head -n 5
+<span class="string">Thistle Release Helper 1.5.0
+Commands: init, prepare, release...</span>
+                    </div>
+                </div>
+                <div>
+                    <h3>Windows Installation</h3>
+                    <div class="code">
+<span class="comment"># PowerShell (Run as Administrator)</span>
+$VER = "1.5.0"
+$ARCH = "x86_64-pc-windows-msvc"
+
+<span class="comment"># Download (no gz on Windows)</span>
+$url = "https://downloads.thistle.tech/`
+embedded-client/$VER/trh-$VER-$ARCH.exe"
+
+<span class="comment"># Download to C:\tools</span>
+New-Item -Path C:\tools -ItemType Directory
+Invoke-WebRequest $url `
+  -OutFile "C:\tools\trh.exe"
+
+<span class="comment"># Add to PATH permanently</span>
+[Environment]::SetEnvironmentVariable(
+  "Path", 
+  "$env:Path;C:\tools", 
+  "Machine"
+)
+
+<span class="comment"># Test (open new terminal)</span>
+trh.exe --version
+                    </div>
+                </div>
+            </div>
+            
+            <div class="alert alert-info">
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M12 6v6l4 2"/>
+                </svg>
+                <div>
+                    <strong>What TRH does:</strong> Creates manifests, compresses files, generates Ed25519 signatures, uploads to Thistle cloud<br>
+                    <a href="https://docs.thistle.tech/update/command_line_tools" style="color: var(--primary);">📖 TRH Command Reference</a> | 
+                    <a href="https://docs.thistle.tech/binaries" style="color: var(--primary);">📦 All Architectures</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 21: Configure Thistle Project -->
+        <div class="slide">
+            <h1>
+                <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                </svg>
+                Initialize Thistle Project
+            </h1>
+            <p class="lead">Create keys and device configuration</p>
+            
+            <h3>1. Set API Token (on your workstation)</h3>
+            <div class="code">
+<span class="comment"># Get from: app.thistle.tech → Settings → API Token</span>
+export THISTLE_TOKEN="tht_proj_xxxxxxxxxxxxxxxxxxxxxx"
+            </div>
+            
+            <h3>2. Initialize Configuration</h3>
+            <div class="code">
+<span class="comment"># Create project directory</span>
+mkdir ~/beagley-ota-project && cd ~/beagley-ota-project
+
+<span class="comment"># Initialize with persistent storage at /boot</span>
+trh init --persist="/boot"
+
+<span class="comment"># Creates:</span>
+<span class="string">config.json</span>     - Device enrollment config
+<span class="string">manifest.json</span>   - Update template
+<span class="string">release_keys/</span>   - Your signing keys (keep safe!)
+            </div>
+        </div>
+
+        <!-- Slide 22: Deploy Config to Device -->
+        <div class="slide">
+            <h1>
+                <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15l-5.5 5.5-3-3"/>
+                    <path d="M5 12V7a2 2 0 0 1 2-2h10l5 5v10a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-8"/>
+                </svg>
+                Transfer Config to Device
+            </h1>
+            <p class="lead">Give your device its Thistle identity</p>
+            
+            <h3>Copy Config to BeagleY-AI</h3>
+            <div class="code">
+<span class="comment"># From your workstation</span>
+scp config.json debian@beagley-ota.local:/tmp/
+            </div>
+            
+            <h3>Install Config on Device</h3>
+            <div class="code">
+<span class="comment"># SSH to device</span>
+ssh debian@beagley-ota.local
+
+<span class="comment"># Move to persistent location</span>
+sudo mv /tmp/config.json /boot/tuc-config.json
+sudo chmod 644 /boot/tuc-config.json
+
+<span class="comment"># Verify</span>
+ls -la /boot/tuc-config.json
+            </div>
+            
+            <div class="alert alert-warning">
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="12" y1="8" x2="12" y2="12"/>
+                    <line x1="12" y1="16" x2="12.01" y2="16"/>
+                </svg>
+                <div>
+                    <strong>Security:</strong> Never share your private key in release_keys/!
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 23: Create Blink Script -->
+        <div class="slide">
+            <h1>
+                <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="5"/>
+                    <line x1="12" y1="1" x2="12" y2="3"/>
+                    <line x1="12" y1="21" x2="12" y2="23"/>
+                </svg>
+                Create LED Blink Update
+            </h1>
+            <p class="lead">A simple script to prove OTA works</p>
+            
+            <h3>GPIO Wiring</h3>
+            <div style="padding: 1rem; background: var(--bg-secondary); border-radius: 8px;">
+                Pin 8 (GPIO14) → LED (+) → LED → 220Ω-2.2kΩ → Pin 6 (GND)
+            </div>
+            
+            <h3>Create Update Script</h3>
+            <div class="code">
+mkdir -p ~/beagley-ota-project/ota-files
+cd ~/beagley-ota-project
+
+cat > ota-files/blink.sh << 'EOF'
+#!/bin/bash
+echo "OTA Update Success! LED blinking..."
+while true; do
+  gpioset $(gpiofind GPIO14)=1  # ON
+  sleep 0.5
+  gpioset $(gpiofind GPIO14)=0  # OFF
+  sleep 0.5
+done
+EOF
+
+chmod +x ota-files/blink.sh
+            </div>
+        </div>
+
+        <!-- Slide 24: Package and Sign -->
+        <div class="slide">
+            <h1>
+                <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                </svg>
+                Package, Sign & Release
+            </h1>
+            <p class="lead">Send your update to the cloud</p>
+            
+            <h3>1. Prepare Update</h3>
+            <div class="code">
+<span class="comment"># Package and sign</span>
+trh prepare --target=./ota-files --file-base-path=/opt/example
+
+<span class="comment"># This:</span>
+<span class="string">• Compresses files</span>
+<span class="string">• Generates SHA256 hashes</span>
+<span class="string">• Signs with Ed25519 key</span>
+<span class="string">• Updates manifest.json</span>
+            </div>
+            
+            <h3>2. Release to Cloud</h3>
+            <div class="code">
+trh release
+
+<span class="string">Uploading manifest...</span>
+<span class="string">Release successful! Version: 1</span>
+            </div>
+        </div>
+
+        <!-- Slide 25: Deploy Update -->
+        <div class="slide">
+            <h1>
+                <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="20 6 9 17 4 12"/>
+                </svg>
+                Deploy Update to Device
+            </h1>
+            <p class="lead">Watch your signed update deploy!</p>
+            
+            <h3>Run Update Client</h3>
+            <div class="code">
+<span class="comment"># On BeagleY-AI</span>
+sudo tuc -c /boot/tuc-config.json
+
+<span class="string">[INFO] Enrolling device...</span>
+<span class="string">[INFO] Checking for updates...</span>
+<span class="string">[INFO] New update: Version 1</span>
+<span class="string">[INFO] Verifying signature...</span>
+<span class="string">[INFO] Installing to /opt/example/</span>
+<span class="string">[SUCCESS] Update applied!</span>
+            </div>
+            
+            <h3>Test It!</h3>
+            <div class="code">
+<span class="comment"># Run the deployed script</span>
+sudo bash /opt/example/blink.sh
+
+<span class="string">OTA Update Success! LED blinking...</span>
+<span class="comment"># LED should now be blinking! Press Ctrl+C to stop</span>
+            </div>
+        </div>
+
+        <!-- Slide 26: What Just Happened -->
+            </h1>
+            <p class="lead">TUC fetches, verifies, and atomically applies updates</p>
+            
+            <h3>SSH into BeagleY-AI First</h3>
+            <div class="code">
+<span class="comment"># From your computer, connect to the BeagleY-AI</span>
+<span class="command">your-computer$</span> ssh debian@beagley-ota.local
+<span class="comment"># Or use: ssh debian@192.168.7.2 (USB)</span>
+
+<span class="comment"># You're now on the BeagleY-AI - verify with:</span>
+<span class="command">debian@beagley-ota:~$</span> hostname
+beagley-ota
+            </div>
+            
+            <h3>Download and Install TUC (on BeagleY-AI)</h3>
+            <div class="code">
+<span class="comment"># TUC is written in Rust for memory safety and performance</span>
+<span class="comment"># ARM64 binary for BeagleY-AI's Cortex-A53</span>
+
+VER=1.5.0
+ARCH=aarch64-unknown-linux-musl
+
+<span class="comment"># Download (25MB) - using HTTPS for security</span>
+curl -LO "https://downloads.thistle.tech/embedded-client/$VER/tuc-$VER-$ARCH.gz"
+
+<span class="comment"># Verify download succeeded</span>
+ls -lh tuc-*.gz
+<span class="string">-rw-r--r-- 1 debian debian 25M Jan 15 10:20 tuc-1.5.0-aarch64-unknown-linux-musl.gz</span>
+
+<span class="comment"># Extract and make executable</span>
+gunzip tuc-$VER-$ARCH.gz
+chmod +x tuc-$VER-$ARCH
+
+<span class="comment"># Install system-wide (needs sudo)</span>
+sudo mv tuc-$VER-$ARCH /usr/local/bin/tuc
+
+<span class="comment"># Verify installation - should show version and usage</span>
+tuc --version
+<span class="string">Thistle Update Client (TUC) 1.5.0</span>
+
+tuc --help | grep -A 2 "USAGE"
+<span class="string">USAGE: tuc [OPTIONS] -c &lt;config-file&gt;</span>
+            </div>
+            
+            <div class="alert alert-info">
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M12 6v6l4 2"/>
+                </svg>
+                <div>
+                    <strong>Security Note:</strong> TUC runs with minimal privileges except when installing files. It verifies all updates cryptographically before 
+applying.<br>
+                    <a href="https://docs.thistle.tech/update/command_line_tools#thistle-update-client-tuc" style="color: var(--primary);">📖 TUC Documentation</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 11: Configure Thistle Project -->
+        <div class="slide">
+            <h1>
+                <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                </svg>
+                Initialize Thistle Configuration
+            </h1>
+            <p class="lead">Create cryptographic keys and device enrollment</p>
+            
+            <h3>Step 1: Set API Token (on your workstation)</h3>
+            <div class="code">
+<span class="comment"># Get token from: https://app.thistle.tech → Project Settings → API Token</span>
+<span class="comment"># This token authenticates your tools to the Thistle backend</span>
+
+<span class="comment"># Linux/macOS:</span>
+export THISTLE_TOKEN="<span class="string">tht_proj_xxxxxxxxxxxxxxxxxxxxxx</span>"
+
+<span class="comment"># Windows PowerShell:</span>
+$env:THISTLE_TOKEN="<span class="string">tht_proj_xxxxxxxxxxxxxxxxxxxxxx</span>"
+
+<span class="comment"># Verify it's set:</span>
+echo $THISTLE_TOKEN | cut -c1-20
+<span class="string">tht_proj_xxxxxxxxxxx...</span>
+            </div>
+            
+            <h3>Step 2: Initialize Configuration</h3>
+            <div class="code">
+<span class="comment"># Create a project directory</span>
+mkdir ~/beagley-ota-project && cd ~/beagley-ota-project
+
+<span class="comment"># Initialize Thistle configuration</span>
+trh init --persist="/boot"
+
+<span class="comment"># What --persist="/boot" means:</span>
+<span class="comment"># - /boot survives reboots on BeagleY-AI (FAT partition)</span>
+<span class="comment"># - Stores manifest state for update tracking</span>
+<span class="comment"># - Required for A/B updates and rollback</span>
+
+<span class="comment"># This command creates:</span>
+<span class="string">✓ config.json</span>      <span class="comment"># Device configuration with enrollment token</span>
+<span class="string">✓ manifest.json</span>   <span class="comment"># Template for update manifests</span>
+<span class="string">✓ release_keys/</span>   <span class="comment"># Ed25519 private/public keypair (KEEP SAFE!)</span>
+
+ls -la
+<span class="string">-rw-r--r-- config.json     (2.1K)</span>
+<span class="string">-rw-r--r-- manifest.json   (1.5K)</span>
+<span class="string">drwx------ release_keys/   (Contains private.pem, public.pem)</span>
+            </div>
+            
+            <h3>Step 3: Deploy Config to Device</h3>
+            <div class="code">
+<span class="comment"># Copy config to BeagleY-AI (from workstation)</span>
+scp config.json debian@beagley-ota.local:/tmp/
+
+<span class="comment"># SSH to device and install config</span>
+ssh debian@beagley-ota.local
+
+<span class="comment"># Move to persistent location with correct permissions</span>
+sudo mv /tmp/config.json /boot/tuc-config.json
+sudo chown root:root /boot/tuc-config.json
+sudo chmod 644 /boot/tuc-config.json
+
+<span class="comment"># Verify it's in place</span>
+ls -la /boot/tuc-config.json
+<span class="string">-rw-r--r-- 1 root root 2134 Jan 15 10:30 /boot/tuc-config.json</span>
+            </div>
+            
+            <div class="alert alert-warning">
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="12" y1="8" x2="12" y2="12"/>
+                    <line x1="12" y1="16" x2="12.01" y2="16"/>
+                </svg>
+                <div>
+                    <strong>Security:</strong> Never share <code>release_keys/private.pem</code>! Anyone with this key can sign updates for your devices.<br>
+                    <a href="https://docs.thistle.tech/update/get_started/file_update#initializing-thistle-ota" style="color: var(--primary);">📖 Configuration Details</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 12: Create the Blink Script -->
+        <div class="slide">
+            <h1>
+                <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="5"/>
+                    <line x1="12" y1="1" x2="12" y2="3"/>
+                    <line x1="12" y1="21" x2="12" y2="23"/>
+                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                    <line x1="1" y1="12" x2="3" y2="12"/>
+                    <line x1="21" y1="12" x2="23" y2="12"/>
+                </svg>
+                Create Your Update: LED Blink Script
+            </h1>
+            <p class="lead">Visual proof that OTA works - an LED that blinks via deployed code</p>
+            
+            <h3>Understanding BeagleY-AI GPIO</h3>
+            <div class="code">
+<span class="comment"># BeagleY-AI uses Linux GPIO character device interface (libgpiod)</span>
+<span class="comment"># 40-pin header follows Raspberry Pi layout for compatibility</span>
+<span class="comment"># GPIO14 = Physical Pin 8 (4th pin down on inner row)</span>
+
+<span class="comment"># Wiring diagram:</span>
+<span class="string">Pin 8 (GPIO14) ──>[LED Anode (+)]──>[LED]──>[220Ω-2.2kΩ]──> Pin 6 (GND)</span>
+<span class="comment">#                  Long leg         Red/Green/Yellow        Any ground pin</span>
+            </div>
+            
+            <h3>Create the Update Script</h3>
+            <div class="code">
+<span class="comment"># On your workstation - create update directory</span>
+mkdir -p ~/beagley-ota-project/ota-files
+cd ~/beagley-ota-project
+
+<span class="comment"># Create the blink script with proper error handling</span>
+cat > ota-files/blink.sh << 'EOF'
+#!/bin/bash
+<span class="string"># BeagleY-AI GPIO LED Blink - Deployed via Thistle OTA
+# Demonstrates successful cryptographically-verified update
+# GPIO Reference: https://docs.beagleboard.org/boards/beagley/ai/demos/using-gpio.html</span>
+
+set -euo pipefail  <span class="comment"># Exit on error, undefined vars, pipe failures</span>
+
+echo "======================================"
+echo "🎉 OTA Update Successfully Deployed!"
+echo "======================================"
+echo "Version: 1.0.0"
+echo "Target: GPIO14 (Physical Pin 8)"
+echo "Press Ctrl+C to stop"
+echo ""
+
+<span class="comment"># Find the GPIO chip and line for GPIO14</span>
+<span class="comment"># gpiofind returns: gpiochip0 14 (chip and line number)</span>
+if ! GPIO_INFO=$(gpiofind GPIO14 2>/dev/null); then
+    echo "ERROR: Cannot find GPIO14. Is libgpiod installed?"
+    echo "Install with: sudo apt-get install gpiod"
+    exit 1
+fi
+
+GPIO_CHIP=$(echo $GPIO_INFO | cut -d' ' -f1)
+GPIO_LINE=$(echo $GPIO_INFO | cut -d' ' -f2)
+
+echo "Using: $GPIO_CHIP line $GPIO_LINE"
+echo "Starting blink pattern..."
+
+<span class="comment"># Trap Ctrl+C to clean up GPIO state</span>
+trap "echo -e '\nCleaning up...'; gpioset $GPIO_CHIP $GPIO_LINE=0; exit 0" SIGINT SIGTERM
+
+<span class="comment"># Main blink loop - 0.5 second on/off for visibility</span>
+while true; do
+    gpioset $GPIO_CHIP $GPIO_LINE=1  <span class="comment"># LED ON - High (3.3V)</span>
+    sleep 0.5
+    gpioset $GPIO_CHIP $GPIO_LINE=0  <span class="comment"># LED OFF - Low (0V)</span>
+    sleep 0.5
+done
+EOF
+
+<span class="comment"># Make executable</span>
+chmod +x ota-files/blink.sh
+
+<span class="comment"># Test locally if you have gpioset installed</span>
+head -n 5 ota-files/blink.sh
+            </div>
+            
+            <div class="alert alert-info">
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M12 6v6l4 2"/>
+                </svg>
+                <div>
+                    <strong>Why a blink script?</strong> It's simple, visual, and proves the entire OTA chain works - from signing to deployment to execution.<br>
+                    <a href="https://docs.beagleboard.org/boards/beagley/ai/demos/using-gpio.html" style="color: var(--primary);">📖 BeagleY-AI GPIO Guide</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 13: Package and Sign -->
+        <div class="slide">
+            <h1>
+                <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                    <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+                    <line x1="12" y1="22.08" x2="12" y2="12"/>
+                </svg>
+                Package, Sign, and Release
+            </h1>
+            <p class="lead">Three commands that cryptographically secure your update</p>
+            
+            <h3>Step 1: Prepare the Update Package</h3>
+            <div class="code">
+<span class="comment"># From your project directory (~/beagley-ota-project)</span>
+<span class="comment"># This command does FIVE critical things:</span>
+
+trh prepare --target=./ota-files --file-base-path=/opt/example
+
+<span class="comment"># 1. Scans ./ota-files/ directory for all files</span>
+<span class="comment"># 2. Compresses with zstd (better than gzip for embedded)</span>
+<span class="comment"># 3. Calculates SHA256 hash of each file</span>
+<span class="comment"># 4. Signs manifest with Ed25519 private key</span>
+<span class="comment"># 5. Updates manifest.json with version and signatures</span>
+
+<span class="comment"># --target: What files to include in update</span>
+<span class="comment"># --file-base-path: Where files install on device</span>
+
+<span class="comment"># Output:</span>
+<span class="string">Preparing release...
+Found 1 file(s) in ./ota-files
+Compressing blink.sh... (367 bytes → 198 bytes)
+Generating manifest signature...
+Manifest updated: version 1</span>
+            </div>
+            
+            <h3>Step 2: Upload to Thistle Cloud</h3>
+            <div class="code">
+<span class="comment"># Push the signed update to Thistle's CDN</span>
+trh release
+
+<span class="comment"># What happens:</span>
+<span class="comment"># 1. Authenticates using THISTLE_TOKEN</span>
+<span class="comment"># 2. Uploads manifest.json to Thistle API</span>
+<span class="comment"># 3. Uploads compressed payload to S3/CDN</span>
+<span class="comment"># 4. Makes update available to all project devices</span>
+
+<span class="comment"># Output:</span>
+<span class="string">Uploading manifest to Thistle...
+Uploading payload blink.sh.zst (198 bytes)...
+Release successful!
+Version: 1
+Created: 2024-01-15T10:35:22Z
+Devices will receive update on next check</span>
+
+<span class="comment"># Verify in dashboard (optional):</span>
+<span class="comment"># https://app.thistle.tech → Releases → Version 1</span>
+            </div>
+            
+            <h3>Understanding the Manifest</h3>
+            <div class="code">
+<span class="comment"># View what was created (manifest.json excerpt):</span>
+{
+  "version": 1,
+  "files": [{
+    "path": "/opt/example/blink.sh",
+    "hash": "sha256:7a3b9c2d4e5f6789...",
+    "size": 367,
+    "mode": "0755"
+  }],
+  "signature": "mKjH3zBwR2y4N8vL..."  <span class="comment"># Ed25519 signature</span>
+}
+            </div>
+            
+            <div class="alert alert-info">
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M12 6v6l4 2"/>
+                </svg>
+                <div>
+                    <strong>Security:</strong> Even if someone intercepts the update, they can't modify it without your private key. The device will reject any tampered 
+updates.<br>
+                    <a href="https://docs.thistle.tech/update/command_line_tools#prepare" style="color: var(--primary);">📖 Manifest Structure</a> | 
+                    <a href="https://docs.thistle.tech/update/security" style="color: var(--primary);">🔐 Security Model</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 14: Deploy the Update -->
+        <div class="slide">
+            <h1>
+                <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="20 6 9 17 4 12"/>
+                </svg>
+                Deploy Update to Device
+            </h1>
+            <p class="lead">The moment of truth - watch your signed update deploy automatically</p>
+            
+            <h3>Run Update Client on BeagleY-AI</h3>
+            <div class="code">
+<span class="comment"># SSH to your device</span>
+ssh debian@beagley-ota.local
+
+<span class="comment"># Run TUC with your configuration</span>
+<span class="comment"># First run: Device enrolls with Trust-On-First-Use (TOFU)</span>
+<span class="comment"># Subsequent runs: Device is already enrolled</span>
+sudo tuc -c /boot/tuc-config.json
+
+<span class="comment"># What you'll see (verbose output):</span>
+<span class="string">[2024-01-15 10:23:45] INFO: Starting Thistle Update Client v1.5.0
+[2024-01-15 10:23:45] INFO: Loading config from /boot/tuc-config.json
+[2024-01-15 10:23:45] INFO: Device ID: beagley-ota-7a3b9c2d
+[2024-01-15 10:23:46] INFO: Enrolling device with Thistle backend...
+[2024-01-15 10:23:46] INFO: Trust-On-First-Use: Storing device keys
+[2024-01-15 10:23:47] INFO: Checking for updates...
+[2024-01-15 10:23:47] INFO: Current version: 0, Latest version: 1
+[2024-01-15 10:23:48] INFO: New update available: Version 1
+[2024-01-15 10:23:48] INFO: Downloading manifest...
+[2024-01-15 10:23:48] INFO: Verifying Ed25519 signature...
+[2024-01-15 10:23:48] INFO: Signature valid: ✓
+[2024-01-15 10:23:49] INFO: Downloading payload (367 bytes)...
+[2024-01-15 10:23:49] INFO: Verifying SHA256: 7a3b9c2d... ✓
+[2024-01-15 10:23:49] INFO: Installing files to /opt/example/
+[2024-01-15 10:23:49] INFO: Atomic rename: .tmp/blink.sh → blink.sh
+[2024-01-15 10:23:50] INFO: Setting permissions: 755
+[2024-01-15 10:23:50] INFO: Writing manifest to /boot/.thistle/
+[2024-01-15 10:23:50] SUCCESS: Update v1 applied successfully!</span>
+
+<span class="comment"># TUC continues running by default (daemon mode)</span>
+<span class="comment"># Press Ctrl+C to exit, or add --once flag for single check</span>
+            </div>
+            
+            <h3>Understanding What Happened</h3>
+            <div class="two-column">
+                <div class="card">
+                    <h3>Security Chain</h3>
+                    <ul style="font-size: 0.95rem;">
+                        <li>✓ TLS connection verified</li>
+                        <li>✓ Ed25519 signature checked</li>
+                        <li>✓ SHA256 hash validated</li>
+                        <li>✓ Atomic file operations</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>Failure Scenarios Handled</h3>
+                    <ul style="font-size: 0.95rem;">
+                        <li>✓ Power loss = no corruption</li>
+                        <li>✓ Bad signature = rejected</li>
+                        <li>✓ Network interruption = retry</li>
+                        <li>✓ Disk full = pre-check</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="alert alert-info">
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M12 6v6l4 2"/>
+                </svg>
+                <div>
+                    <strong>Production Note:</strong> In real deployments, TUC runs as a systemd service checking periodically for updates.<br>
+                    <a href="https://docs.thistle.tech/update/get_started/file_update#running-the-update-client" style="color: var(--primary);">📖 TUC Daemon Mode</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 15: Test the Update -->
+        <div class="slide">
+            <h1>
+                <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="2">
+                    <polygon points="5 3 19 12 5 21 5 3"/>
+                </svg>
+                Verify and Test
+            </h1>
+            <p class="lead">See your OTA update in action</p>
+            
+            <h3>Check Installation</h3>
+            <div class="code">
+<span class="comment"># Verify file was deployed</span>
+ls -la /opt/example/
+<span class="string">total 12</span>
+<span class="string">-rwxr-xr-x 1 root root 367 Jan 15 10:23 blink.sh</span>
+
+<span class="comment"># Check content</span>
+head -n 3 /opt/example/blink.sh
+<span class="string">#!/bin/bash</span>
+<span class="string"># BeagleY-AI GPIO LED Blink - OTA Demo</span>
+            </div>
+            
+            <h3>Run the Script!</h3>
+            <div class="code">
+<span class="comment"># Execute the deployed script</span>
+sudo bash /opt/example/blink.sh
+
+<span class="string">🎉 OTA Update Successful! Starting LED blink...</span>
+<span class="string">Press Ctrl+C to stop</span>
+
+<span class="comment"># LED on Pin 8 should now be blinking!</span>
+            </div>
+            
+            <div class="alert alert-success">
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                    <path d="M22 4L12 14.01l-3-3"/>
+                </svg>
+                <div>
+                    <strong>Achievement Unlocked!</strong> You've successfully deployed a cryptographically signed OTA update!
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 16: How It All Works -->
+        <div class="slide">
+            <h1>
+                <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="5" r="2"/>
+                    <circle cx="12" cy="19" r="2"/>
+                    <circle cx="5" cy="12" r="2"/>
+                    <circle cx="19" cy="12" r="2"/>
+                    <path d="M12 5v14M5 12h14"/>
+                </svg>
+                Security Architecture
+            </h1>
+            <p class="lead">What makes this system production-ready</p>
+            
+            <div class="grid">
+                <div class="card">
+                    <h3>Cryptographic Chain</h3>
+                    <p><strong>Private Key:</strong> Only you have it</p>
+                    <p><strong>Public Key:</strong> Device verifies with it</p>
+                    <p><strong>Result:</strong> Nobody else can create valid updates</p>
+                </div>
+                <div class="card">
+                    <h3>Atomic Operations</h3>
+                    <p><strong>Download:</strong> To temporary location</p>
+                    <p><strong>Verify:</strong> Before any changes</p>
+                    <p><strong>Apply:</strong> All-or-nothing via rename()</p>
+                </div>
+                <div class="card">
+                    <h3>Fail-Safe Design</h3>
+                    <p><strong>Power loss:</strong> No corruption</p>
+                    <p><strong>Bad update:</strong> Rejected before apply</p>
+                    <p><strong>Network issues:</strong> Automatic retry</p>
+                </div>
+            </div>
+            
+            <div class="alert alert-info">
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M12 6v6l4 2"/>
+                </svg>
+                <div>
+                    This exact process scales to thousands of devices with zero changes to your workflow
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 17: Production Best Practices -->
+        <div class="slide">
+            <h1>
+                <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                </svg>
+                From Demo to Production
+            </h1>
+            <p class="lead">How companies deploy to millions of devices</p>
+            
+            <div class="two-column">
+                <div>
+                    <h3>CI/CD Integration</h3>
+                    <div class="code">
+<span class="comment"># GitHub Actions example</span>
+- name: Deploy OTA Update
+  env:
+    THISTLE_TOKEN: ${{ secrets.TOKEN }}
+  run: |
+    trh prepare --target=./release
+    trh release --channel=stable
+                    </div>
+                </div>
+                <div>
+                    <h3>Advanced Features</h3>
+                    <ul>
+                        <li><strong>A/B Updates:</strong> Full rootfs swaps</li>
+                        <li><strong>Delta Updates:</strong> Only send changes</li>
+                        <li><strong>Staged Rollouts:</strong> 1% → 10% → 100%</li>
+                        <li><strong>Device Groups:</strong> Target by region/type</li>
+                        <li><strong>Secure Boot:</strong> Hardware verification</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="alert alert-warning">
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                    <line x1="12" y1="9" x2="12" y2="13"/>
+                    <line x1="12" y1="17" x2="12.01" y2="17"/>
+                </svg>
+                <div>
+                    <strong>Next Month:</strong> Advanced workshop on A/B updates and Secure Boot
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 18: Troubleshooting -->
+        <div class="slide">
+            <h1>
+                <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="3"/>
+                    <path d="M12 1v6M12 17v6M4.22 4.22l4.24 4.24M15.54 15.54l4.24 4.24M1 12h6M17 12h6M4.22 19.78l4.24-4.24M15.54 8.46l4.24-4.24"/>
+                </svg>
+                Quick Troubleshooting
+            </h1>
+            <p class="lead">Common issues and instant fixes</p>
+            
+            <div class="grid">
+                <div class="card">
+                    <h3>Can't SSH?</h3>
+                    <ul style="font-size: 0.95rem;">
+                        <li>Wait 90 seconds after boot</li>
+                        <li>Try: 192.168.7.2 (USB)</li>
+                        <li>Check: beagley-ota.local</li>
+                        <li>Verify USB cable has data</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>Update Not Fetching?</h3>
+                    <ul style="font-size: 0.95rem;">
+                        <li>Check: ping google.com</li>
+                        <li>Verify THISTLE_TOKEN set</li>
+                        <li>Run: tuc -v (verbose mode)</li>
+                        <li>Check Thistle dashboard</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>LED Not Blinking?</h3>
+                    <ul style="font-size: 0.95rem;">
+                        <li>GPIO14 = Physical Pin 8</li>
+                        <li>LED long leg = positive</li>
+                        <li>Need 2.2kΩ resistor</li>
+                        <li>Test: gpioset 0 14=1</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="alert alert-info">
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M12 6v6l4 2"/>
+                </svg>
+                <div>
+                    Full troubleshooting guide: docs.thistle.tech/troubleshooting
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 19: Resources -->
+        <div class="slide">
+            <h1>
+                <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                </svg>
+                Resources & Next Steps
+            </h1>
+            <p class="lead">Continue your OTA journey with these resources</p>
+            
+            <div class="grid">
+                <div class="card">
+                    <h3>📚 Documentation</h3>
+                    <p><strong>Thistle Docs</strong><br>
+                    <a href="https://docs.thistle.tech" style="color: var(--primary);">docs.thistle.tech</a></p>
+                    <p><strong>BeagleBoard Docs</strong><br>
+                    <a href="https://docs.beagleboard.org/boards/beagley/ai/" style="color: var(--primary);">docs.beagleboard.org/boards/beagley/ai/</a></p>
+                    <p><strong>Code Examples</strong><br>
+                    <a href="https://github.com/thistletech/examples" style="color: var(--primary);">github.com/thistletech/examples</a></p>
+                </div>
+                <div class="card">
+                    <h3>💬 Community Support</h3>
+                    <p><strong>BeagleBoard Discord</strong><br>
+                    <a href="https://discord.gg/beagleboard" style="color: var(--primary);">discord.gg/beagleboard</a></p>
+                    <p><strong>BeagleBoard Forum</strong><br>
+                    <a href="https://forum.beagleboard.org" style="color: var(--primary);">forum.beagleboard.org</a></p>
+                    <p><strong>Thistle Support</strong><br>
+                    support@thistle.tech</p>
+                </div>
+                <div class="card">
+                    <h3>🎓 Learning Paths</h3>
+                    <p><strong>Next: Secure Boot</strong><br>
+                    <a href="https://docs.thistle.tech/hardware/beagleboard/" style="color: var(--primary);">A/B Updates Guide</a></p>
+                    <p><strong>Video Tutorials</strong><br>
+                    <a href="https://www.youtube.com/@BeagleBoard" style="color: var(--primary);">youtube.com/@BeagleBoard</a></p>
+                    <p><strong>Advanced Topics</strong><br>
+                    <a href="https://docs.thistle.tech/update/advanced" style="color: var(--primary);">Delta Updates & Groups</a></p>
+                </div>
+            </div>
+            
+            <div class="alert alert-success">
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                    <path d="M22 4L12 14.01l-3-3"/>
+                </svg>
+                <div>
+                    <strong>Special Offer:</strong> Mention "BeagleY-OTA-Lab" for 6 months free Thistle Pro tier (normally $99/month)<br>
+                    <strong>Join Next Month:</strong> "Secure Boot & A/B Updates on BeagleY-AI" - Register at beagleboard.org/events
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 20: Thank You -->
+        <div class="slide title-slide">
+            <h1>Mission Accomplished!</h1>
+            <p class="subtitle">You've Built Production-Ready OTA</p>
+            
+            <div class="grid" style="max-width: 800px; margin: 2rem auto;">
+                <div class="card" style="text-align: center;">
+                    <h3>What You Built</h3>
+                    <p>✓ Secure update system</p>
+                    <p>✓ Cryptographic signing</p>
+                    <p>✓ Atomic operations</p>
+                    <p>✓ Real hardware control</p>
+                </div>
+                <div class="card" style="text-align: center;">
+                    <h3>What You Learned</h3>
+                    <p>✓ Embedded Linux</p>
+                    <p>✓ PKI concepts</p>
+                    <p>✓ IoT best practices</p>
+                    <p>✓ Production workflows</p>
+                </div>
+            </div>
+            
+            <div style="margin-top: 2rem; color: var(--text-muted);">
+                <p><strong>Thank you for joining us!</strong></p>
+                <p>BeagleBoard.org × Thistle Technologies</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button onclick="previousSlide()" id="prevBtn">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="15 18 9 12 15 6"/>
+            </svg>
+            Previous
+        </button>
+        <button onclick="nextSlide()" id="nextBtn">
+            Next
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="9 18 15 12 9 6"/>
+            </svg>
+        </button>
+        <button onclick="toggleFullscreen()">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+            </svg>
+            Fullscreen
+        </button>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        function showSlide(n) {
+            // Hide all slides
+            slides.forEach(slide => {
+                slide.classList.remove('active');
+                slide.style.display = 'none';
+            });
+            
+            // Wrap around if needed
+            currentSlide = n;
+            if (currentSlide >= totalSlides) currentSlide = 0;
+            if (currentSlide < 0) currentSlide = totalSlides - 1;
+            
+            // Show current slide
+            slides[currentSlide].style.display = 'flex';
+            slides[currentSlide].classList.add('active');
+            
+            // Update UI elements
+            document.getElementById('slideNumber').textContent = `${currentSlide + 1} / ${totalSlides}`;
+            document.getElementById('progressBar').style.width = `${((currentSlide + 1) / totalSlides) * 100}%`;
+            
+            // Update button states
+            document.getElementById('prevBtn').disabled = currentSlide === 0;
+            document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
+        }
+
+        function nextSlide() {
+            if (currentSlide < totalSlides - 1) {
+                showSlide(currentSlide + 1);
+            }
+        }
+
+        function previousSlide() {
+            if (currentSlide > 0) {
+                showSlide(currentSlide - 1);
+            }
+        }
+
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') nextSlide();
+            if (e.key === 'ArrowLeft') previousSlide();
+            if (e.key === 'f' || e.key === 'F') toggleFullscreen();
+            if (e.key === 'Escape' && document.fullscreenElement) document.exitFullscreen();
+        });
+
+        // Touch support
+        let touchStartX = 0;
+        document.addEventListener('touchstart', e => touchStartX = e.touches[0].clientX);
+        document.addEventListener('touchend', e => {
+            const touchEndX = e.changedTouches[0].clientX;
+            const diff = touchStartX - touchEndX;
+            if (Math.abs(diff) > 50) {
+                if (diff > 0) nextSlide();
+                else previousSlide();
+            }
+        });
+
+        // Initialize - hide all slides first, then show the first one
+        slides.forEach((slide, index) => {
+            if (index !== 0) {
+                slide.style.display = 'none';
+                slide.classList.remove('active');
+            }
+        });
+        showSlide(0);
+    </script>
+</body>
+</html>

@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>BeagleY-AI + Thistle OTA Updates - Professional Codelab</title>
+
+  <!-- Reveal.js Core -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/reveal.css">
+  <link rel="stylesheet" href="../../framework/thistle-theme.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github-dark.min.css">
+</head>
+
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+      <!-- Title Slide -->
+      <section class="title-slide" data-background-gradient="linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0c4a6e 100%)">
+        <h1>BeagleY-AI + Thistle OTA</h1>
+        <p class="subtitle">Professional Over-The-Air Updates Workshop</p>
+
+        <div class="logos">
+          <span class="logo">BeagleBoard.org</span>
+          <span class="logo">Thistle Technologies</span>
+        </div>
+
+        <div class="alert alert-info" style="max-width: 600px; margin: 2rem auto;">
+          <strong>Today's Mission:</strong> Deploy cryptographically signed software updates wirelessly to embedded Linux hardware using modern security practices.
+        </div>
+
+        <p style="margin-top: 2rem; font-size: 1rem; color: var(--text-muted);">
+          <strong>Resources:</strong> docs.thistle.tech • docs.beagleboard.org<br>
+          <strong>Duration:</strong> 90 minutes • <strong>Level:</strong> Beginner to Intermediate
+        </p>
+      </section>
+
+      <!-- Why OTA Updates Matter -->
+      <section>
+        <h2>Why OTA Updates Matter</h2>
+        <p class="lead">The $14.5 billion IoT security crisis</p>
+
+        <div class="grid grid-3">
+          <div class="card">
+            <h3>📊 The Problem</h3>
+            <p>60% of IoT devices never receive security updates</p>
+            <span class="badge badge-error">Critical Risk</span>
+          </div>
+          <div class="card">
+            <h3>⚡ The Cost</h3>
+            <p>Unpatched devices cost billions in breaches annually</p>
+            <span class="badge badge-warning">Business Impact</span>
+          </div>
+          <div class="card">
+            <h3>✅ The Solution</h3>
+            <p>Automated OTA updates like smartphones use</p>
+            <span class="badge badge-success">Modern Security</span>
+          </div>
+        </div>
+
+        <div class="alert alert-info">
+          <h3>What You'll Build Today</h3>
+          <div class="grid grid-2">
+            <ul>
+              <li>Cryptographic signing pipeline</li>
+              <li>Atomic file operations</li>
+              <li>Cloud update delivery</li>
+            </ul>
+            <ul>
+              <li>Power-loss protection</li>
+              <li>Automatic rollback</li>
+              <li>Production-ready security</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- File Update vs Secure Boot -->
+      <section>
+        <h2>File Update vs. Secure Boot OTA</h2>
+
+        <div class="grid grid-2">
+          <div class="card">
+            <h3>🚀 File Updates (Today)</h3>
+            <ul>
+              <li><strong>Signed manifests</strong> - Not raw files</li>
+              <li><strong>Atomic application</strong> - All or nothing</li>
+              <li><strong>Rollback safety</strong> - Verification fails = reject</li>
+              <li><strong>Cloud + fleet management</strong> - Coordinated delivery</li>
+            </ul>
+            <span class="pill">Simple • Secure • Production-Ready</span>
+          </div>
+
+          <div class="card">
+            <h3>🔒 Secure Boot OTA (Next Level)</h3>
+            <ul>
+              <li><strong>Verified boot chain</strong> - Bootloader + kernel</li>
+              <li><strong>A/B partitions</strong> - Full system rollback</li>
+              <li><strong>Trust chain</strong> - Hardware to application</li>
+              <li><strong>Tamper resistance</strong> - Rootfs protection</li>
+            </ul>
+            <span class="pill">Enterprise • Zero-Trust • Bulletproof</span>
+          </div>
+        </div>
+
+        <div class="alert alert-warning">
+          <strong>Key Insight:</strong> Even "simple" file updates use the same security model - signed manifests, verification, and atomic delivery. Secure Boot just extends the trust chain deeper.
+        </div>
+      </section>
+
+      <!-- Prerequisites -->
+      <section>
+        <h2>Prerequisites Checklist</h2>
+        <p class="lead">Get everything ready before we begin</p>
+
+        <div class="grid grid-2">
+          <div class="card">
+            <h3>🔧 Required Hardware</h3>
+            <div class="steps">
+              <div class="step">BeagleY-AI board</div>
+              <div class="step">32GB+ microSD card (Class 10)</div>
+              <div class="step">USB-C cable (data capable)</div>
+              <div class="step">Computer with internet</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>💡 Optional Hardware</h3>
+            <div class="steps">
+              <div class="step">LED (any color)</div>
+              <div class="step">220Ω-2.2kΩ resistor</div>
+              <div class="step">Breadboard & jumpers</div>
+              <div class="step">Ethernet cable</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="alert alert-warning">
+          <strong>Action Required:</strong> Create your free Thistle account at <code>app.thistle.tech</code> → Create Project → Copy API Token
+        </div>
+
+        <div class="card">
+          <h3>📦 Software Prerequisites</h3>
+          <p><strong>bb-imager v1.0.0+</strong> • <strong>SSH client</strong> • <strong>Text editor</strong> • <strong>Terminal/Command Line</strong></p>
+        </div>
+      </section>
+
+      <!-- Step 1: Flash BeagleY-AI -->
+      <section>
+        <h2>Step 1: Flash BeagleY-AI</h2>
+        <p class="lead">Create bootable SD card with headless configuration</p>
+
+        <div class="card">
+          <h3>Download bb-imager from beagleboard.org/distros</h3>
+          <p style="color: var(--text-muted);">Windows: .exe • macOS: .dmg • Linux: .AppImage</p>
+        </div>
+
+        <div class="grid grid-2">
+          <div class="steps">
+            <div class="step"><strong>Device:</strong> BeagleY-AI</div>
+            <div class="step"><strong>OS:</strong> Debian 12 XFCE</div>
+            <div class="step"><strong>Storage:</strong> Your SD card</div>
+            <div class="step"><strong>Settings ⚙️</strong> (Critical!)</div>
+          </div>
+
+          <div class="card">
+            <h3>OS Customization (Essential)</h3>
+            <ul>
+              <li>✅ Enable SSH (password auth)</li>
+              <li>✅ Username: <code>debian</code></li>
+              <li>✅ Password: [choose strong]</li>
+              <li>✅ Hostname: <code>beagley-ota</code></li>
+              <li>✅ WiFi: [optional]</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="command">
+          Write to SD card - Takes 10-15 minutes
+        </div>
+
+        <div class="alert alert-info">
+          <strong>Pro Tip:</strong> The bb-imager pre-configuration saves manual setup time. SSH and networking will work immediately after first boot.
+        </div>
+      </section>
+
+      <!-- Step 2: Connect -->
+      <section>
+        <h2>Step 2: Connect to BeagleY-AI</h2>
+        <p class="lead">Boot and establish SSH connection</p>
+
+        <div class="card">
+          <h3>First Boot Sequence</h3>
+          <p><span class="step-number">1</span>Insert SD card → <span class="step-number">2</span>Connect power → <span class="step-number">3</span>Wait 60-90 seconds</p>
+        </div>
+
+        <div class="grid grid-3">
+          <div class="card">
+            <h3>USB Network</h3>
+            <pre><code class="language-bash"># Linux/Mac:
+ssh debian@192.168.7.2
+
+# Windows:
+ssh debian@192.168.6.2</code></pre>
+          </div>
+
+          <div class="card">
+            <h3>mDNS</h3>
+            <pre><code class="language-bash">ssh debian@beagley-ota.local
+
+# Password: what you set</code></pre>
+          </div>
+
+          <div class="card">
+            <h3>Direct IP</h3>
+            <pre><code class="language-bash">ssh debian@[IP-ADDRESS]
+
+# Find in router/wifi settings</code></pre>
+          </div>
+        </div>
+
+        <div class="alert alert-success">
+          <strong>Verification:</strong> Once connected, run <code>uname -a</code> and <code>ping -c 2 google.com</code> to verify system and network.
+        </div>
+      </section>
+
+      <!-- Step 3: Install Tools -->
+      <section>
+        <h2>Step 3: Install Thistle Tools</h2>
+        <p class="lead">TRH on workstation, TUC on device</p>
+
+        <div class="card">
+          <h3>Install TRH (Your Computer)</h3>
+          <pre><code class="language-bash"># Thistle Release Helper - packages and signs updates
+VER=1.6.0
+curl -LO "https://downloads.thistle.tech/embedded-client/$VER/trh-$VER-x86_64-unknown-linux-musl.gz"
+gunzip trh-*.gz && chmod +x trh-* && sudo mv trh-* /usr/local/bin/trh
+
+# Verify installation
+trh --help</code></pre>
+        </div>
+
+        <div class="card">
+          <h3>Install TUC (BeagleY-AI via SSH)</h3>
+          <pre><code class="language-bash"># Thistle Update Client - receives and applies updates
+VER=1.6.0
+curl -LO "https://downloads.thistle.tech/embedded-client/$VER/tuc-$VER-aarch64-unknown-linux-musl.gz"
+gunzip tuc-*.gz && chmod +x tuc-* && sudo mv tuc-* /usr/local/bin/tuc
+
+# Verify installation
+tuc --help | head -n 3</code></pre>
+        </div>
+
+        <div class="alert alert-info">
+          <strong>Architecture Note:</strong> Use the correct binary for your platform - x86_64 for most PCs, aarch64 for BeagleY-AI.
+        </div>
+      </section>
+
+      <!-- Step 4: Initialize Project -->
+      <section>
+        <h2>Step 4: Initialize Project</h2>
+        <p class="lead">Create signing keys and configuration</p>
+
+        <div class="card">
+          <h3>Workstation Setup</h3>
+          <pre><code class="language-bash"># Set API token (keep this secret!)
+export THISTLE_TOKEN="tht_proj_xxxxxxxxxxxxxx"
+
+# Initialize project with remote signing
+mkdir ~/beagley-demo && cd ~/beagley-demo
+trh --signing-method="remote" init
+
+# This creates:
+# config.json     - Device enrollment config
+# manifest.json   - Update template</code></pre>
+        </div>
+
+        <div class="card">
+          <h3>Deploy Config to BeagleY-AI</h3>
+          <pre><code class="language-bash"># Generate device-specific config
+trh --signing-method="remote" gen-device-config \
+  --device-name="beagley-demo" \
+  --enrollment-type="group-enroll" \
+  --persist="/boot"
+
+# Copy to device
+scp config.json debian@beagley-ota.local:/tmp/
+ssh debian@beagley-ota.local "sudo mv /tmp/config.json /boot/tuc-config.json"</code></pre>
+        </div>
+
+        <div class="alert alert-warning">
+          <strong>Security:</strong> Your API token is like a password. Never commit it to version control or share it publicly.
+        </div>
+      </section>
+
+      <!-- Step 5: Create Update -->
+      <section>
+        <h2>Step 5: Create Update Script</h2>
+        <p class="lead">Simple LED blink to prove OTA works</p>
+
+        <div class="alert alert-info">
+          <strong>Optional Hardware:</strong> Connect LED to Pin 8 (GPIO14) → LED → Resistor → Pin 6 (GND)
+        </div>
+
+        <div class="card">
+          <h3>Create Blink Script</h3>
+          <pre><code class="language-bash">mkdir -p ~/beagley-demo/files
+cat > ~/beagley-demo/files/blink.sh << 'EOF'
+#!/bin/bash
+echo "🎉 OTA Update Success! Version 1.0"
+echo "Press Ctrl+C to stop"
+
+# Blink LED on GPIO14 (if connected)
+while true; do
+  # Check if GPIO tools available
+  if command -v gpioset >/dev/null 2>&1; then
+    gpioset gpiochip0 14=1  # LED ON
+    sleep 0.5
+    gpioset gpiochip0 14=0  # LED OFF
+    sleep 0.5
+  else
+    echo "LED blink simulation (GPIO tools not found)"
+    sleep 1
+  fi
+done
+EOF
+
+chmod +x ~/beagley-demo/files/blink.sh</code></pre>
+        </div>
+
+        <div class="alert alert-success">
+          <strong>Smart Fallback:</strong> Script works with or without GPIO hardware - perfect for demonstrations.
+        </div>
+      </section>
+
+      <!-- Step 6: Package and Release -->
+      <section>
+        <h2>Step 6: Sign & Release Update</h2>
+        <p class="lead">Package, sign, and upload to cloud</p>
+
+        <div class="card">
+          <h3>Package and Sign</h3>
+          <pre><code class="language-bash"># Package files and create signed manifest
+cd ~/beagley-demo
+trh --signing-method="remote" prepare \
+  --target=./files \
+  --file-base-path=/opt/demo
+
+# Upload to Thistle cloud
+trh --signing-method="remote" release</code></pre>
+        </div>
+
+        <div class="alert alert-success">
+          <strong>Expected Output:</strong>
+          <pre><code>Uploading manifest...
+Release successful! Version: 1</code></pre>
+        </div>
+
+        <div class="card">
+          <h3>What Just Happened?</h3>
+          <div class="grid grid-2">
+            <ul>
+              <li>✅ Files compressed with zstd</li>
+              <li>✅ SHA256 hash calculated</li>
+              <li>✅ Manifest signed with your key</li>
+            </ul>
+            <ul>
+              <li>✅ Uploaded to global CDN</li>
+              <li>✅ Available to all enrolled devices</li>
+              <li>✅ Cryptographically verified</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- Step 7: Deploy -->
+      <section>
+        <h2>Step 7: Deploy to Device</h2>
+        <p class="lead">Watch the secure update process</p>
+
+        <div class="card">
+          <h3>Run Update Client</h3>
+          <pre><code class="language-bash"># On BeagleY-AI - run update client
+sudo tuc -c /boot/tuc-config.json</code></pre>
+        </div>
+
+        <div class="alert alert-info">
+          <strong>Expected Process:</strong>
+          <pre><code>[INFO] Enrolling device...
+[INFO] Checking for updates...
+[INFO] New update available: Version 1
+[INFO] Downloading manifest...
+[INFO] Verifying signature... ✓
+[INFO] Installing to /opt/demo/
+[SUCCESS] Update applied!</code></pre>
+        </div>
+
+        <div class="card">
+          <h3>Test Your Update</h3>
+          <pre><code class="language-bash"># Verify file installed
+ls -l /opt/demo/blink.sh
+
+# Run the blink script
+sudo bash /opt/demo/blink.sh</code></pre>
+        </div>
+
+        <div class="alert alert-success">
+          <strong>Success!</strong> Your LED should blink (or message appears) - OTA update delivered successfully!
+        </div>
+      </section>
+
+      <!-- Production Best Practices -->
+      <section>
+        <h2>Production Best Practices</h2>
+        <p class="lead">Scale from prototype to millions</p>
+
+        <div class="grid grid-2">
+          <div class="card">
+            <h3>CI/CD Integration</h3>
+            <pre><code class="language-yaml"># GitHub Actions Example
+- name: Deploy OTA Update
+  env:
+    THISTLE_TOKEN: ${{ secrets.THISTLE_TOKEN }}
+  run: |
+    trh --signing-method="remote" prepare --target=./release
+    trh --signing-method="remote" release</code></pre>
+          </div>
+
+          <div class="card">
+            <h3>Advanced Features</h3>
+            <ul>
+              <li><strong>A/B Updates:</strong> Full rootfs with rollback</li>
+              <li><strong>Delta Updates:</strong> 90% smaller packages</li>
+              <li><strong>Device Groups:</strong> Staged rollout control</li>
+              <li><strong>Secure Boot:</strong> Full verification chain</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="grid grid-3">
+          <div class="card">
+            <h3>🚗 Automotive</h3>
+            <p>10,000+ EV chargers receiving secure updates</p>
+            <span class="badge badge-success">Production</span>
+          </div>
+          <div class="card">
+            <h3>🏭 Industrial</h3>
+            <p>50,000+ sensors with fail-safe updates</p>
+            <span class="badge badge-success">Production</span>
+          </div>
+          <div class="card">
+            <h3>🏥 Healthcare</h3>
+            <p>5,000+ monitors with zero downtime</p>
+            <span class="badge badge-success">Production</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Troubleshooting -->
+      <section>
+        <h2>Troubleshooting Guide</h2>
+        <p class="lead">Common issues and solutions</p>
+
+        <div class="grid grid-3">
+          <div class="card">
+            <h3>❌ No Update Available</h3>
+            <ul>
+              <li>Check device internet connection</li>
+              <li>Verify THISTLE_TOKEN is set</li>
+              <li>Confirm <code>trh release</code> succeeded</li>
+              <li>Check device enrollment status</li>
+            </ul>
+          </div>
+
+          <div class="card">
+            <h3>🔍 Debug Logs</h3>
+            <ul>
+              <li>Run TUC with <code>-v</code> flag</li>
+              <li>Check enrollment process</li>
+              <li>Verify signature validation</li>
+              <li>Monitor file installation</li>
+            </ul>
+          </div>
+
+          <div class="card">
+            <h3>💡 LED Not Blinking</h3>
+            <ul>
+              <li>Check wiring and polarity</li>
+              <li>Verify GPIO14 pin connection</li>
+              <li>Test <code>gpioset</code> command</li>
+              <li>Run script shows simulation message</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="alert alert-info">
+          <strong>Pro Tip:</strong> Use <code>trh fetch-current</code> to inspect your released manifest and verify it contains the expected files.
+        </div>
+      </section>
+
+      <!-- What You Achieved -->
+      <section>
+        <h2>What You Just Achieved</h2>
+        <p class="lead">Professional OTA infrastructure in under 90 minutes</p>
+
+        <div class="grid grid-2">
+          <div class="card">
+            <h3>🔐 Security Implemented</h3>
+            <ul>
+              <li>Cryptographic signing with remote KMS</li>
+              <li>Device verification before installation</li>
+              <li>Atomic file operations (no partial updates)</li>
+              <li>Trust-on-first-use enrollment</li>
+            </ul>
+          </div>
+
+          <div class="card">
+            <h3>🚀 Production Features</h3>
+            <ul>
+              <li>Cloud-based update distribution</li>
+              <li>Fleet management and tracking</li>
+              <li>Rollback safety mechanisms</li>
+              <li>Scalable to thousands of devices</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="alert alert-success">
+          <strong>Key Insight:</strong> You're not just blinking an LED - you've implemented the same security model used by smartphones, automotive systems, and industrial IoT deployments.
+        </div>
+
+        <div class="card">
+          <h3>Next Steps</h3>
+          <ul>
+            <li><strong>Explore A/B Updates:</strong> Full system rollback with dual partitions</li>
+            <li><strong>Implement Secure Boot:</strong> Extend trust chain to bootloader</li>
+            <li><strong>CI/CD Integration:</strong> Automate releases from your build pipeline</li>
+            <li><strong>Device Groups:</strong> Stage updates across your fleet</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- Thank You -->
+      <section class="title-slide">
+        <h1>Mission Complete!</h1>
+        <p class="subtitle">You've built production-ready OTA updates</p>
+
+        <div class="alert alert-success" style="max-width: 700px; margin: 2rem auto;">
+          <strong>You mastered:</strong> Cryptographic signing • Atomic updates • Cloud delivery • Fail-safe design • Professional deployment
+        </div>
+
+        <div class="logos">
+          <span class="logo">BeagleBoard.org</span>
+          <span class="logo">Thistle Technologies</span>
+        </div>
+
+        <p style="margin-top: 2rem; font-size: 1.1rem;">
+          <strong>Resources:</strong> docs.thistle.tech • docs.beagleboard.org<br>
+          <strong>Community:</strong> discord.gg/beagleboard • Thistle Support<br>
+          <strong>Next:</strong> Secure Boot & A/B Updates Workshop
+        </p>
+
+        <div class="alert alert-info" style="max-width: 600px; margin: 2rem auto;">
+          <strong>Questions?</strong> Use arrow keys to navigate back to any section or press 'S' for speaker notes.
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <!-- Reveal.js and Plugins -->
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/reveal.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@5/plugin/notes/notes.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@5/plugin/search/search.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@5/plugin/zoom/zoom.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@5/plugin/highlight/highlight.js"></script>
+  <script src="../../framework/codelab-framework.js"></script>
+
+  <script>
+    // Initialize Reveal.js
+    Reveal.initialize({
+      hash: true,
+      controls: true,
+      progress: true,
+      center: false,
+      slideNumber: 'c/t',
+      width: 1280,
+      height: 720,
+      margin: 0.04,
+      plugins: [RevealNotes, RevealSearch, RevealZoom, RevealHighlight],
+
+      // Navigation configuration
+      keyboard: {
+        67: () => { // 'C' key for copy
+          const currentSlide = Reveal.getCurrentSlide();
+          const firstCodeBlock = currentSlide.querySelector('pre code');
+          if (firstCodeBlock && navigator.clipboard) {
+            navigator.clipboard.writeText(firstCodeBlock.textContent);
+          }
+        }
+      },
+
+      // Theme and visual settings
+      transition: 'slide',
+      transitionSpeed: 'default',
+      backgroundTransition: 'fade'
+    });
+
+    // Add speaker notes for key slides
+    Reveal.addEventListener('ready', () => {
+      // Add contextual help
+      console.log('🚀 Thistle Codelab Ready!');
+      console.log('💡 Press "C" to copy code blocks');
+      console.log('📖 Press "S" for speaker notes');
+      console.log('🔍 Press "/" to search');
+    });
+  </script>
+</body>
+</html>

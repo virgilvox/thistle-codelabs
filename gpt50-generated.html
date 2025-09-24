@@ -1,0 +1,425 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>BeagleY‑AI + Thistle Tech — OTA Updates Made Easy (Codelab)</title>
+  <!-- Reveal.js core & plugins (CDN) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/reveal.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/theme/black.css" id="theme">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github-dark.min.css">
+  <style>
+    :root{
+      --teal-900:#032b2f; --teal-800:#074a4f; --teal-700:#0b6b73; --teal-600:#118a93;
+      --teal-500:#14b3c2; --teal-400:#4fd3de; --teal-300:#87e6ec; --teal-200:#b9f3f6; --teal-100:#e6fbfd;
+      --ink:#eaf8fa; --muted:#9adbe3; --card-bg:rgba(6,38,41,.55);
+    }
+    /* Teal motif + readability tweaks */
+    .reveal{ color: var(--ink);}    
+    .reveal .slides{ text-align:left; }
+    .reveal a{ color: var(--teal-300); }
+    .reveal pre code{ font-size: .8em; line-height:1.35; }
+    .r-fit { font-size: .9em; }
+    .lead { font-size:1.2em; line-height:1.3; }
+    .pill{ display:inline-block; padding:.25em .6em; border-radius:999px; background:var(--card-bg); border:1px solid rgba(255,255,255,.08); }
+    .grid{ display:grid; gap:1rem; }
+    .cols-2{ grid-template-columns: 1fr 1fr; }
+    .cols-3{ grid-template-columns: repeat(3, 1fr); }
+    .card{ background: var(--card-bg); border:1px solid rgba(255,255,255,.08); border-radius: 16px; padding:1rem; box-shadow: 0 10px 30px rgba(0,0,0,.25); }
+    .ok{ color:#9CFBA1; }
+    .warn{ color:#FFD580; }
+    .bad{ color:#FF9C9C; }
+    .teal-grad{
+      background: radial-gradient(1000px 600px at 10% -10%, rgba(20,179,194,.35), transparent),
+                  radial-gradient(1000px 600px at 110% 110%, rgba(79,211,222,.18), transparent),
+                  linear-gradient(135deg, var(--teal-900), #101418 55%, #0e1b1e 100%) !important;
+    }
+    .logo-row{ display:flex; gap:1rem; align-items:center; }
+    .logo{ display:inline-block; padding:.35em .7em; border-radius:.6rem; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.08); font-weight:700; 
+letter-spacing:.02em; }
+    .kbd{ display:inline-block; border:1px solid rgba(255,255,255,.25); border-bottom-width:3px; padding:.1em .4em; border-radius:.4em; font-weight:700; }
+    .step{ counter-increment: step; }
+    .step::before{ content: counter(step); display:inline-grid; place-items:center; width:1.5em; height:1.5em; margin-right:.5em; border-radius:999px; 
+background:var(--teal-700); font-weight:700; }
+    .footnote{ font-size:.7em; opacity:.9; }
+    .reveal .slide-number{ background:rgba(0,0,0,.35); }
+    .reveal .controls{ color: var(--teal-300); }
+    .reveal .progress{ background: rgba(255,255,255,.12); height:5px; }
+    .reveal .progress span{ background: var(--teal-500); }
+    /* Print-friendly */
+    @media print{ .reveal section{ page-break-inside: avoid; } }
+  </style>
+</head>
+<body class="teal-grad">
+  <div class="reveal">
+    <div class="slides">
+
+      <!-- Title -->
+      <section data-background-opacity="0.0">
+        <h2>BeagleY‑AI + Thistle Tech</h2>
+        <h3>OTA Updates Made Easy — Hands‑On Codelab</h3>
+        <p class="logo-row">
+          <span class="logo">BeagleBoard.org</span>
+          <span class="logo">Thistle Technologies</span>
+          <span class="pill">Beginner → Pro</span>
+          <span class="pill">Teal Motif</span>
+        </p>
+        <p class="lead">Goal: set up a BeagleY‑AI with Thistle OTA and ship a <strong>file update</strong> that blinks an LED via GPIO.</p>
+        <p class="footnote">Resources: <a href="https://docs.beagleboard.org" target="_blank">docs.beagleboard.org</a> · <a href="https://docs.thistle.tech" 
+target="_blank">docs.thistle.tech</a></p>
+        <aside class="notes">
+          Welcome folks! We’ll alternate concepts and demos. Follow along live; each step is a bite‑sized block with copy‑paste commands.
+        </aside>
+      </section>
+
+      <!-- Agenda (horizontal parent) -->
+      <section>
+        <section>
+          <h3>Agenda — From Zero to OTA Hero</h3>
+          <ol>
+            <li class="fragment">Intro: BeagleY‑AI + Thistle — why together?</li>
+            <li class="fragment">Setup checklist: hardware & accounts</li>
+            <li class="fragment">Flash OS with <code>bb‑imager</code></li>
+            <li class="fragment">Install tools: TRH (host) & TUC (device)</li>
+            <li class="fragment">Configure project & device</li>
+            <li class="fragment">Create release: LED blink script</li>
+            <li class="fragment">Deploy & verify</li>
+            <li class="fragment">Wrap‑up + next steps (TVB, A/B)</li>
+          </ol>
+        </section>
+        <section>
+          <h3>How to Navigate</h3>
+          <p>
+            <span class="kbd">←</span> <span class="kbd">→</span> slides · 
+            <span class="kbd">↓</span> vertical deep‑dives · 
+            <span class="kbd">S</span> speaker notes · 
+            <span class="kbd">F</span> fullscreen · 
+            <span class="kbd">Esc</span> overview
+          </p>
+          <p><span class="pill">Pro tip</span> Press <span class="kbd">/</span> to search, <span class="kbd">Alt</span> + click to zoom.</p>
+        </section>
+      </section>
+
+      <!-- Intro / Why -->
+      <section>
+        <section>
+          <h3>BeagleY‑AI at a Glance</h3>
+          <div class="grid cols-2">
+            <div class="card">
+              <ul>
+                <li>TI AM67A SoC · quad Cortex‑A53 @ ~1.4 GHz</li>
+                <li>AI accel (~4 TOPS), dual C7x DSPs</li>
+                <li>USB 3, GbE, Wi‑Fi 6/BLE 5.4, HDMI, MIPI CSI</li>
+                <li>40‑pin GPIO header (Pi‑compatible layout)</li>
+              </ul>
+              <p class="footnote">Docs: BeagleY‑AI Intro & Quick‑Start.</p>
+            </div>
+            <div class="card">
+              <p class="lead">Why here? Open‑source, robust, and maker‑friendly. Perfect target for a modern, secure OTA workflow.</p>
+              <div class="pill">Demo: Blink LED via GPIO</div>
+            </div>
+          </div>
+          <aside class="notes">Call out the 40‑pin header and that we’ll use GPIO14 (HAT pin 8) for the blink.</aside>
+        </section>
+        <section>
+          <h3>Thistle Technologies — What & Why</h3>
+          <div class="grid cols-2">
+            <div class="card">
+              <ul>
+                <li><strong>TUC</strong> (device client): fetch, verify, apply</li>
+                <li><strong>TRH</strong> (dev tool): package, sign, upload</li>
+                <li>Cryptographic signing · TOFU enrollment</li>
+                <li>File updates <em>and</em> A/B image updates</li>
+              </ul>
+            </div>
+            <div class="card">
+              <svg viewBox="0 0 640 260" style="width:100%;height:auto">
+                <defs>
+                  <linearGradient id="g" x1="0" x2="1">
+                    <stop offset="0" stop-color="#14b3c2"/><stop offset="1" stop-color="#4fd3de"/>
+                  </linearGradient>
+                </defs>
+                <rect x="0" y="0" width="640" height="260" fill="rgba(255,255,255,.04)" rx="16"/>
+                <g font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#eaf8fa" font-size="14">
+                  <rect x="24" y="24" width="180" height="64" rx="10" fill="url(#g)" opacity=".18" stroke="#4fd3de"/>
+                  <text x="34" y="54">Thistle Release Helper</text>
+                  <rect x="240" y="24" width="160" height="64" rx="10" fill="url(#g)" opacity=".18" stroke="#4fd3de"/>
+                  <text x="250" y="54">Thistle Cloud</text>
+                  <rect x="440" y="24" width="176" height="64" rx="10" fill="url(#g)" opacity=".18" stroke="#4fd3de"/>
+                  <text x="450" y="54">BeagleY‑AI (TUC)</text>
+                  <path d="M204 56h32" stroke="#4fd3de" stroke-width="2" marker-end="url(#arrow)"/>
+                  <path d="M400 56h32" stroke="#4fd3de" stroke-width="2" marker-end="url(#arrow)"/>
+                  <text x="220" y="82" fill="#9adbe3">manifest + payload</text>
+                  <text x="462" y="82" fill="#9adbe3">verify & apply</text>
+                </g>
+                <defs>
+                  <marker id="arrow" markerWidth="10" markerHeight="10" refX="6" refY="3" orient="auto" markerUnits="strokeWidth">
+                    <path d="M0,0 L0,6 L9,3 z" fill="#4fd3de" />
+                  </marker>
+                </defs>
+              </svg>
+            </div>
+          </div>
+          <aside class="notes">Emphasize: signed updates; servers can’t alter payloads; device only accepts what you sign.</aside>
+        </section>
+      </section>
+
+      <!-- Setup Checklist -->
+      <section>
+        <h3>Setup — What You Need</h3>
+        <div class="grid cols-2">
+          <div class="card">
+            <ul>
+              <li class="step">BeagleY‑AI + 5V/3A power</li>
+              <li class="step">microSD (≥ 32 GB)</li>
+              <li class="step">USB‑C cable (power + RNDIS)</li>
+              <li class="step">LED + 2.2 kΩ + jumpers (optional)</li>
+            </ul>
+          </div>
+          <div class="card">
+            <ul>
+              <li class="step">Host laptop (macOS/Linux/Win)</li>
+              <li class="step">Thistle account + Project token</li>
+              <li class="step">Docs handy: beagle & thistle</li>
+              <li class="step">Terminal + basic git/curl</li>
+            </ul>
+          </div>
+        </div>
+        <aside class="notes">Pause for folks to confirm hardware and account are ready.</aside>
+      </section>
+
+      <!-- Flashing OS (vertical stack) -->
+      <section>
+        <section>
+          <h3>Flash BeagleY‑AI with <code>bb‑imager</code></h3>
+          <ol>
+            <li>Install <strong>bb‑imager</strong> for your OS</li>
+            <li>Choose device: <em>BeagleY‑AI</em></li>
+            <li>Choose OS: Debian 12‑based image</li>
+            <li>Write to your microSD and insert</li>
+          </ol>
+          <p class="footnote">Defaults: user <code>debian</code>. USB networking exposes SSH via <code>192.168.7.2</code>.</p>
+          <aside class="notes">Quick sanity: boot LEDs, try SSH or serial if needed.</aside>
+        </section>
+        <section>
+          <h4>First Login</h4>
+          <pre><code class="language-bash" data-trim>
+ssh debian@192.168.7.2   # pwd per image notes (or your set creds)
+uname -a                 # check kernel
+ping -c 2 google.com     # confirm network
+          </code></pre>
+        </section>
+      </section>
+
+      <!-- Install TRH/TUC (vertical) -->
+      <section>
+        <section>
+          <h3>Install Thistle Tools — Host (TRH)</h3>
+          <pre><code class="language-bash" data-trim>
+VER=1.5.0
+curl -LO https://downloads.thistle.tech/embedded-client/$VER/\
+  trh-$VER-x86_64-unknown-linux-musl.gz
+gunzip trh-$VER-x86_64-unknown-linux-musl.gz
+chmod +x trh-$VER-x86_64-unknown-linux-musl
+ln -s trh-$VER-x86_64-unknown-linux-musl trh   # optional symlink
+./trh --help
+          </code></pre>
+          <aside class="notes">Windows users: download .exe.gz; use PowerShell. macOS: use the apple‑darwin build.</aside>
+        </section>
+        <section>
+          <h3>Install Thistle Tools — Device (TUC)</h3>
+          <pre><code class="language-bash" data-trim>
+VER=1.5.0
+curl -LO https://downloads.thistle.tech/embedded-client/$VER/\
+  tuc-$VER-aarch64-unknown-linux-musl.gz
+gunzip tuc-$VER-aarch64-unknown-linux-musl.gz
+chmod +x tuc-$VER-aarch64-unknown-linux-musl
+sudo mv tuc-$VER-aarch64-unknown-linux-musl /usr/local/bin/tuc
+
+# Smoke test
+tuc --help | head -n 3
+          </code></pre>
+        </section>
+      </section>
+
+      <!-- Configure Project & Device (vertical) -->
+      <section>
+        <section>
+          <h3>Configure Project & Device</h3>
+          <div class="grid cols-2">
+            <div class="card">
+              <p class="pill">On your host</p>
+              <pre class="r-fit"><code class="language-bash" data-trim>
+export THISTLE_TOKEN="&lt;Project Access Token&gt;"
+./trh init --persist="/boot"
+# creates: config.json, manifest.json (keys, enrollment)
+              </code></pre>
+            </div>
+            <div class="card">
+              <p class="pill">Copy config to device</p>
+              <pre class="r-fit"><code class="language-bash" data-trim>
+scp config.json debian@192.168.7.2:/tmp/tuc-config.json
+ssh debian@192.168.7.2 "sudo mv /tmp/tuc-config.json /boot/tuc-config.json"
+              </code></pre>
+            </div>
+          </div>
+          <aside class="notes">Using /boot as persistent store as per init flag. TOFU: device enrolls on first contact.</aside>
+        </section>
+        <section>
+          <h4>Wiring (Optional) — LED on GPIO14</h4>
+          <ul>
+            <li>LED + 2.2 kΩ to GND; long leg → GPIO14 (HAT pin 8)</li>
+            <li>Short leg → resistor → GND</li>
+          </ul>
+          <p class="footnote">We’ll toggle with <code>gpioset $(gpiofind GPIO14)=&lt;0|1&gt;</code>.</p>
+        </section>
+      </section>
+
+      <!-- Create Release (vertical) -->
+      <section>
+        <section>
+          <h3>Create an OTA Release — Blink Script</h3>
+          <pre><code class="language-bash" data-trim>
+mkdir -p ota-files
+cat &gt; ota-files/blink.sh &lt;&lt;'EOF'
+#!/bin/bash
+# Simple LED blink for GPIO14
+set -euo pipefail
+GPIO=$(gpiofind GPIO14)
+[ -z "$GPIO" ] &amp;&amp; { echo "GPIO14 not found"; exit 1; }
+
+trap 'gpioset $GPIO=0' EXIT
+echo "Blinking LED on GPIO14 every 1s"
+while true; do gpioset $GPIO=1; sleep 1; gpioset $GPIO=0; sleep 1; done
+EOF
+chmod +x ota-files/blink.sh
+          </code></pre>
+        </section>
+        <section>
+          <h4>Package &amp; Sign with TRH</h4>
+          <pre><code class="language-bash" data-trim>
+./trh prepare --target=./ota-files --file-base-path=/opt/example
+./trh release   # uploads manifest + payload to your project
+# (Optional) Inspect
+./trh fetch-current | head -n 40
+          </code></pre>
+          <aside class="notes">This installs files under /opt/example/ on device. Manifest is signed with your key.</aside>
+        </section>
+      </section>
+
+      <!-- Deploy & Verify (vertical) -->
+      <section>
+        <section>
+          <h3>Deploy to Device</h3>
+          <pre><code class="language-bash" data-trim>
+sudo tuc -c /boot/tuc-config.json   # enroll, fetch, verify, apply
+# After apply, verify file landed
+ls -l /opt/example/blink.sh
+          </code></pre>
+          <p class="footnote">Run with <code>-v</code> for verbose logs. Network required for first fetch.</p>
+        </section>
+        <section>
+          <h4>Run the Blink</h4>
+          <pre><code class="language-bash" data-trim>
+bash /opt/example/blink.sh   # Ctrl+C to stop
+          </code></pre>
+          <p><span class="ok">✅ LED blinking?</span> Congrats — you just delivered a secure OTA file update.</p>
+        </section>
+        <section>
+          <h4>What You Just Achieved</h4>
+          <ul>
+            <li>Signed manifest → server → device</li>
+            <li>Device verified authenticity before apply</li>
+            <li>Atomic file placement; safe failure modes</li>
+            <li>Scales from 1 → 1000s of devices</li>
+          </ul>
+        </section>
+      </section>
+
+      <!-- Troubleshooting -->
+      <section>
+        <h3>Quick Troubleshooting</h3>
+        <div class="grid cols-3">
+          <div class="card">
+            <h4>No update?</h4>
+            <ul>
+              <li>Check internet on device</li>
+              <li>Token exported on host?</li>
+              <li><code>./trh release</code> succeeded?</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h4>Client logs</h4>
+            <ul>
+              <li><code>tuc -v -c /boot/tuc-config.json</code></li>
+              <li>Look for enroll/verify/apply</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h4>LED not blinking?</h4>
+            <ul>
+              <li>Wiring &amp; polarity</li>
+              <li>Correct pin (GPIO14)</li>
+              <li><code>gpioset</code> / <code>gpiofind</code> present</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- Next Steps -->
+      <section>
+        <section>
+          <h3>Next Steps — Secure Boot &amp; A/B</h3>
+          <ul>
+            <li>Thistle Verified Boot (TVB) chain</li>
+            <li>Dual rootfs A/B with rollback</li>
+            <li>CI integration for releases</li>
+          </ul>
+          <p class="footnote">Docs: Thistle TVB &amp; A/B guides; Beagle bootloader notes.</p>
+        </section>
+        <section>
+          <h3>Links &amp; Community</h3>
+          <ul>
+            <li><a href="https://docs.beagleboard.org" target="_blank">BeagleBoard Docs</a></li>
+            <li><a href="https://docs.thistle.tech" target="_blank">Thistle Docs</a></li>
+            <li>Beagle forums/Discord · Thistle forum/Slack</li>
+          </ul>
+        </section>
+      </section>
+
+      <!-- Closing -->
+      <section>
+        <h2>Wrap‑Up</h2>
+        <p class="lead">You set up a modern, secure OTA pipeline and shipped your first device update.</p>
+        <p>Questions? Jump back to any step or open the notes (<span class="kbd">S</span>) for the full script.</p>
+        <aside class="notes">
+          Recap key wins; invite Q&amp;A. Encourage attendees to keep their project token safe and rotate when needed. Suggest making the blink a systemd service as a 
+follow‑up.
+        </aside>
+      </section>
+
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/reveal.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@5/plugin/notes/notes.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@5/plugin/search/search.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@5/plugin/zoom/zoom.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@5/plugin/highlight/highlight.js"></script>
+  <script>
+    const deck = new Reveal({
+      hash: true,
+      controls: true,
+      progress: true,
+      slideNumber: 'c/t',
+      center: false,
+      width: 1280,
+      height: 720,
+      margin: 0.06,
+      plugins: [ RevealNotes, RevealSearch, RevealZoom, RevealHighlight ]
+    });
+    deck.initialize();
+  </script>
+</body>
+</html>
+
